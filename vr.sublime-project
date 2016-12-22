@@ -1,0 +1,16 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"folder_exclude_patterns":
+			[
+				"Library",
+				"Temp"
+			],
+			"folder_exclude_patterns":
+			[
+			]
+		}
+	]
+}

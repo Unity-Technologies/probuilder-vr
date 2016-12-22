@@ -1,0 +1,3 @@
+[submodule "Assets/EditorVR"]
+	path = Assets/EditorVR
+	url = https://github.com/Unity-Technologies/EditorVR.git
