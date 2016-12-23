@@ -5,6 +5,7 @@ using UnityEngine.Experimental.EditorVR;
 using UnityEngine.Experimental.EditorVR.Menus;
 using UnityEngine.Experimental.EditorVR.Tools;
 using UnityEngine.Experimental.EditorVR.Utilities;
+using ProBuilder2.Common;
 
 [MainMenuItem("Create Primitive", "ProBuilder", "Create geometry in the scene")]
 public class CreatePrimitiveTool2 : MonoBehaviour, ITool, IStandardActionMap, IConnectInterfaces, IInstantiateMenuUI, IUsesRayOrigin, IUsesSpatialHash
@@ -15,8 +16,6 @@ public class CreatePrimitiveTool2 : MonoBehaviour, ITool, IStandardActionMap, IC
 	const float kDrawDistance = 0.075f;
 
 	GameObject m_ToolMenu;
-
-	PrimitiveType m_SelectedPrimitiveType = PrimitiveType.Cube;
 	bool m_Freeform;
 
 	GameObject m_CurrentGameObject;
@@ -80,7 +79,6 @@ public class CreatePrimitiveTool2 : MonoBehaviour, ITool, IStandardActionMap, IC
 
 	void SetSelectedPrimitive(PrimitiveType type, bool isFreeform)
 	{
-		m_SelectedPrimitiveType = type;
 		m_Freeform = isFreeform;
 	}
 
@@ -88,7 +86,7 @@ public class CreatePrimitiveTool2 : MonoBehaviour, ITool, IStandardActionMap, IC
 	{
 		if (standardInput.action.wasJustPressed)
 		{
-			m_CurrentGameObject = GameObject.CreatePrimitive(m_SelectedPrimitiveType);
+			m_CurrentGameObject = pb_ShapeGenerator.CubeGenerator(Vector3.one).gameObject;
 			
 			// Set starting minimum scale (don't allow zero scale object to be created)
 			const float kMinScale = 0.0025f;
@@ -108,11 +106,11 @@ public class CreatePrimitiveTool2 : MonoBehaviour, ITool, IStandardActionMap, IC
 	{
 		var corner = (m_EndPoint - m_StartPoint).magnitude;
 
-		// it feels better to scale these primitives vertically with the drawpoint
-		if (m_SelectedPrimitiveType == PrimitiveType.Capsule || m_SelectedPrimitiveType == PrimitiveType.Cylinder || m_SelectedPrimitiveType == PrimitiveType.Cube)
+		// // it feels better to scale these primitives vertically with the drawpoint
+		// if (m_SelectedPrimitiveType == PrimitiveType.Capsule || m_SelectedPrimitiveType == PrimitiveType.Cylinder || m_SelectedPrimitiveType == PrimitiveType.Cube)
 			m_CurrentGameObject.transform.localScale = Vector3.one * corner * 0.5f;
-		else
-			m_CurrentGameObject.transform.localScale = Vector3.one * corner;
+		// else
+			// m_CurrentGameObject.transform.localScale = Vector3.one * corner;
 	}
 
 	void UpdatePositions()
