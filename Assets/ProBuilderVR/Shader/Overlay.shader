@@ -2,8 +2,8 @@ Shader "Hidden/ProBuilder VR/Overlay"
 {
 	Properties
 	{
-		_Alpha ("Alpha", Range(0,1)) = .5
-		// _Color ("Color", Color) = (1,1,1,1)
+		_Color ("Color", Color) = (1,1,1,1)
+		_Offset ("Offset", float) = .1
 	}
 
 	SubShader
@@ -24,38 +24,32 @@ Shader "Hidden/ProBuilder VR/Overlay"
 			#pragma fragment frag
 			#include "UnityCG.cginc"
 
-			float _Alpha;
-			// float4 _Color;
+			float _Offset;
+			float4 _Color;
 
 			struct appdata
 			{
 				float4 vertex : POSITION;
-				float4 color : COLOR;
+				float4 normal : NORMAL;
 			};
 
 			struct v2f
 			{
 				float4 pos : SV_POSITION;
-				float4 color : COLOR;
 			};
 
 			v2f vert (appdata v)
 			{
 				v2f o;
 
-				/// https://www.opengl.org/discussion_boards/showthread.php/166719-Clean-Wireframe-Over-Solid-Mesh
-				o.pos = mul(UNITY_MATRIX_MV, v.vertex);
-				o.pos.xyz *= .99;
-				o.pos = mul(UNITY_MATRIX_P, o.pos);
-				o.color = v.color;
+				o.pos = mul(UNITY_MATRIX_MVP, v.vertex + v.normal * _Offset);
 
 				return o;
 			}
 
 			half4 frag (v2f i) : COLOR
 			{
-				return fixed4(i.color.rgb, i.color.a * _Alpha);
-				// return fixed4(_Color.rgb, _Color.a * _Alpha);
+				return _Color;
 			}
 
 			ENDCG
