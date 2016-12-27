@@ -89,6 +89,7 @@ namespace ProBuilder2.VR
 
 				m_DragOrigin = pb.transform.TransformPoint(hit.point);
 				m_DragDirection = pb.transform.TransformDirection(hit.normal);
+				m_DragDirection.Normalize();
 
 				m_Pointer = U.Object.Instantiate(pointer);
 				m_Pointer.transform.localRotation = Quaternion.FromToRotation(Vector3.up, m_DragDirection);
@@ -148,7 +149,7 @@ namespace ProBuilder2.VR
 			if(ad == bd)	
 				return ao;
 
-			Vector3 c = (bo - ao).normalized;
+			Vector3 c = bo - ao;
 
 			float n = -Vector3.Dot(ad, bd) * Vector3.Dot(bd, c) + Vector3.Dot(ad, c) * Vector3.Dot(bd, bd);
 			float d = Vector3.Dot(ad, ad) * Vector3.Dot(bd, bd) - Vector3.Dot(ad, bd) * Vector3.Dot(ad, bd);
