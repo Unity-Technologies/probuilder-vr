@@ -7,11 +7,12 @@ Material:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Face Highlight
-  m_Shader: {fileID: 4800000, guid: 817ccee443175ab4d8e5adf83a89169a, type: 3}
-  m_ShaderKeywords: _EMISSION
+  m_Shader: {fileID: 4800000, guid: 17d79fd9a3d634a40ae219ffcf9befd4, type: 3}
+  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _EMISSION
   m_LightmapFlags: 1
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
+  m_CustomRenderQueue: 3000
+  stringTagMap:
+    RenderType: Transparent
   m_SavedProperties:
     serializedVersion: 2
     m_TexEnvs:
@@ -84,7 +85,7 @@ Material:
       second: 1
     - first:
         name: _DstBlend
-      second: 0
+      second: 10
     - first:
         name: _GlossMapScale
       second: 1
@@ -99,10 +100,13 @@ Material:
       second: 0
     - first:
         name: _Mode
-      second: 0
+      second: 3
     - first:
         name: _OcclusionStrength
       second: 1
+    - first:
+        name: _Offset
+      second: 0.1
     - first:
         name: _Parallax
       second: 0.02
@@ -120,11 +124,11 @@ Material:
       second: 0
     - first:
         name: _ZWrite
-      second: 1
+      second: 0
     m_Colors:
     - first:
         name: _Color
-      second: {r: 0, g: 0.751724, b: 1, a: 1}
+      second: {r: 0, g: 0.737255, b: 0.83137256, a: 0.378}
     - first:
         name: _EmissionColor
       second: {r: 0, g: 0, b: 0, a: 1}

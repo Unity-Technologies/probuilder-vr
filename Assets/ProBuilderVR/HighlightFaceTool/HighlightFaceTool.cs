@@ -22,7 +22,8 @@ namespace ProBuilder2.VR
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 
 		[SerializeField] GameObject pointer;
-		// private GameObject m_Pointer;
+		private GameObject m_Pointer;
+		private HighlightElementsModule m_HighlightModule = null;
 
 	   	enum CreateState
 	   	{
@@ -44,6 +45,12 @@ namespace ProBuilder2.VR
 		void Start()
 		{
 			Selection.objects = new UnityEngine.Object[0];
+			m_HighlightModule = U.Object.CreateGameObjectWithComponent<HighlightElementsModule>();
+		}
+
+		void OnDestroy()
+		{
+			U.Object.Destroy(m_HighlightModule.gameObject);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -60,25 +67,22 @@ namespace ProBuilder2.VR
 
 		private void HandleStart(Standard input, Action<InputControl> consumeControl)
 		{
-			if(!input.action.wasJustPressed)
-				return;
-
 			Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
-
 			pb_RaycastHit hit;
-
 			GameObject first = getFirstGameObject(rayOrigin);
-
 			if(first == null)	
 				return;
-
 			pb_Object pb = first.GetComponent<pb_Object>();
-
 			if(pb == null)	
 				return;
 
 			if( pb_HandleUtility.FaceRaycast(ray, pb, out hit) )
 			{
+				m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] } );
+
+				if(!input.action.wasJustPressed)
+					return;
+
 				m_Object = pb;
 				m_Face = pb.faces[hit.face];
 				m_SelectedIndices = pb.sharedIndices.AllIndicesWithValues(m_Face.distinctIndices);
@@ -86,8 +90,8 @@ namespace ProBuilder2.VR
 				m_DragOrigin = pb.transform.TransformPoint(hit.point);
 				m_DragDirection = pb.transform.TransformDirection(hit.normal);
 
-				// m_Pointer = U.Object.Instantiate(pointer);
-				// m_Pointer.transform.localRotation = Quaternion.FromToRotation(Vector3.up, m_DragDirection);
+				m_Pointer = U.Object.Instantiate(pointer);
+				m_Pointer.transform.localRotation = Quaternion.FromToRotation(Vector3.up, m_DragDirection);
 
 				m_State = CreateState.Finish;
 
@@ -98,8 +102,11 @@ namespace ProBuilder2.VR
 
 				m_Object.ToMesh();
 
-
 				consumeControl(input.action);
+			}
+			else
+			{
+				m_HighlightModule.SetFaceHighlight(pb, null);
 			}
 		}
 
@@ -108,7 +115,8 @@ namespace ProBuilder2.VR
 			// Ready for next object to be created
 			if (input.action.wasJustReleased)
 			{
-				// U.Object.Destroy(m_Pointer);
+				U.Object.Destroy(m_Pointer);
+				m_HighlightModule.SetFaceHighlight(m_Object, null);
 
 				m_State = CreateState.Start;
 
@@ -120,7 +128,7 @@ namespace ProBuilder2.VR
 			else
 			{
 				m_DraggedPoint = CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
-				// m_Pointer.transform.position = m_DraggedPoint;
+				m_Pointer.transform.position = m_DraggedPoint;
 
 				Vector3 localDragOrigin = m_Object.transform.InverseTransformPoint(m_DragOrigin);
 				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(m_DraggedPoint);
@@ -130,10 +138,11 @@ namespace ProBuilder2.VR
 
 				m_Object.SetVertices(m_SettingPositions);
 				m_Object.msh.vertices = m_SettingPositions;
+				m_HighlightModule.UpdateVertices(m_Object);
 			}
 		}
 
-		private Vector3 CalculateNearestPointRayRay(Vector3 ao, Vector3 ad, Vector3 bo, Vector3  bd)
+		private Vector3 CalculateNearestPointRayRay(Vector3 ao, Vector3 ad, Vector3 bo, Vector3 bd)
 		{
 			// ray-ray don't do parallel
 			if(ad == bd)	
@@ -144,12 +153,9 @@ namespace ProBuilder2.VR
 			float n = -Vector3.Dot(ad, bd) * Vector3.Dot(bd, c) + Vector3.Dot(ad, c) * Vector3.Dot(bd, bd);
 			float d = Vector3.Dot(ad, ad) * Vector3.Dot(bd, bd) - Vector3.Dot(ad, bd) * Vector3.Dot(ad, bd);
 
-			return ao + ad * (n/d);
-		}
-
-
-		void OnDestroy()
-		{
+			Vector3 v = ao + ad * (n/d);
+			
+			return v;
 		}
 	}
 }

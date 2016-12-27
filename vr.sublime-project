@@ -13,7 +13,10 @@
 			[
 				"*.meta",
 				"*.sln",
-				"*.csproj"
+				"*.csproj",
+				"*.prefab",
+				"*.asset",
+				"*.mat"
 			]
 		}
 	]
