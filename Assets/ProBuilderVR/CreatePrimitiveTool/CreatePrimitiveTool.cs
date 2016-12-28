@@ -13,12 +13,12 @@ namespace ProBuilder2.VR
 	public class CreatePrimitiveTool : MonoBehaviour, ITool, IStandardActionMap, IConnectInterfaces, IInstantiateMenuUI, IUsesRayOrigin, IUsesSpatialHash
 	{
 		[SerializeField]
-		CreatePrimitiveMenu m_MenuPrefab;
+		CreateProBuilderPrimitiveMenu m_MenuPrefab;
 
 		const float kDrawDistance = 0.075f;
 
 		GameObject m_ToolMenu;
-		bool m_Freeform;
+		Shape m_Shape = Shape.Cube;
 
 		GameObject m_CurrentGameObject;
 
@@ -46,9 +46,9 @@ namespace ProBuilder2.VR
 		void Start()
 		{
 			m_ToolMenu = instantiateMenuUI(rayOrigin, m_MenuPrefab);
-			var createPrimitiveMenu = m_ToolMenu.GetComponent<CreatePrimitiveMenu>();
-			connectInterfaces(createPrimitiveMenu, rayOrigin);
-			createPrimitiveMenu.selectPrimitive = SetSelectedPrimitive;
+			var menu = m_ToolMenu.GetComponent<CreateProBuilderPrimitiveMenu>();
+			connectInterfaces(menu, rayOrigin);
+			menu.selectPrimitive = SetSelectedPrimitive;
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -79,16 +79,25 @@ namespace ProBuilder2.VR
 			}
 		}
 
-		void SetSelectedPrimitive(PrimitiveType type, bool isFreeform)
+		void SetSelectedPrimitive(Shape shape)
 		{
-			m_Freeform = isFreeform;
+			m_Shape = shape;
 		}
 
 		void HandleStartPoint(Standard standardInput, Action<InputControl> consumeControl)
 		{
 			if (standardInput.action.wasJustPressed)
 			{
-				m_CurrentGameObject = pb_ShapeGenerator.CubeGenerator(Vector3.one).gameObject;
+				switch(m_Shape)
+				{
+					case Shape.Stair:
+						m_CurrentGameObject = pb_ShapeGenerator.StairGenerator(Vector3.one, 10, true).gameObject;
+						break;
+					
+					default:
+						m_CurrentGameObject = pb_ShapeGenerator.CubeGenerator(Vector3.one).gameObject;				
+						break;
+				}
 				
 				// Set starting minimum scale (don't allow zero scale object to be created)
 				const float kMinScale = 0.0025f;
@@ -96,7 +105,7 @@ namespace ProBuilder2.VR
 				m_StartPoint = rayOrigin.position + rayOrigin.forward * kDrawDistance;
 				m_CurrentGameObject.transform.position = m_StartPoint;
 
-				m_State = m_Freeform ? PrimitiveCreationStates.Freeform : PrimitiveCreationStates.EndPoint;
+				m_State = PrimitiveCreationStates.EndPoint;
 
 				addToSpatialHash(m_CurrentGameObject);
 
