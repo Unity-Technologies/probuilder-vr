@@ -16,13 +16,13 @@ using ProBuilder2.Common;
 namespace ProBuilder2.VR
 {
 	[MainMenuItem("Highlight Faces", "ProBuilder", "Highlight the face a pointer is currently hovering")]
-	public class HighlightFaceTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults, IExclusiveMode
+	public class TranslateElementTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults, IExclusiveMode
 	{
 		public Transform rayOrigin { get; set; }
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 
 		[SerializeField] GameObject pointer;
-		private GameObject m_Pointer;
+		// private GameObject m_Pointer;
 		private HighlightElementsModule m_HighlightModule = null;
 
 	   	enum CreateState
@@ -91,8 +91,8 @@ namespace ProBuilder2.VR
 				m_DragDirection = pb.transform.TransformDirection(hit.normal);
 				m_DragDirection.Normalize();
 
-				m_Pointer = U.Object.Instantiate(pointer);
-				m_Pointer.transform.localRotation = Quaternion.FromToRotation(Vector3.up, m_DragDirection);
+				// m_Pointer = U.Object.Instantiate(pointer);
+				// m_Pointer.transform.localRotation = Quaternion.FromToRotation(Vector3.up, m_DragDirection);
 
 				m_State = CreateState.Finish;
 
@@ -116,7 +116,7 @@ namespace ProBuilder2.VR
 			// Ready for next object to be created
 			if (input.action.wasJustReleased)
 			{
-				U.Object.Destroy(m_Pointer);
+				// U.Object.Destroy(m_Pointer);
 				m_HighlightModule.SetFaceHighlight(m_Object, null);
 
 				m_State = CreateState.Start;
@@ -129,7 +129,7 @@ namespace ProBuilder2.VR
 			else
 			{
 				m_DraggedPoint = CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
-				m_Pointer.transform.position = m_DraggedPoint;
+				// m_Pointer.transform.position = m_DraggedPoint;
 
 				Vector3 localDragOrigin = m_Object.transform.InverseTransformPoint(m_DragOrigin);
 				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(m_DraggedPoint);

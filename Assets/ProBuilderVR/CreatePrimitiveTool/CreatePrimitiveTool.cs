@@ -28,9 +28,7 @@ namespace ProBuilder2.VR
 		PrimitiveCreationStates m_State = PrimitiveCreationStates.StartPoint;
 
 		public Func<Transform, IMenu, GameObject> instantiateMenuUI { private get; set; }
-
 		public Transform rayOrigin { get; set; }
-
 		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
 
 		public Action<GameObject> addToSpatialHash { get; set; }
@@ -150,7 +148,7 @@ namespace ProBuilder2.VR
 
 		void OnDestroy()
 		{
-			U.Object.Destroy(m_ToolMenu);
+			U.Object.Destroy(m_ToolMenu);	
 		}
 	}
 }

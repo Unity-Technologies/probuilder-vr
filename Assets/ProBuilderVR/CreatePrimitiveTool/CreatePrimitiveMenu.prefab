@@ -359,10 +359,6 @@ MonoBehaviour:
   m_HighlightObjects:
   - {fileID: 114000010068967096}
   - {fileID: 114000013591757400}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!114 &114000012411644178
 MonoBehaviour:
   m_ObjectHideFlags: 1
