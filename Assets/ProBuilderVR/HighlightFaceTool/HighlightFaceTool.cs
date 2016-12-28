@@ -154,9 +154,7 @@ namespace ProBuilder2.VR
 			float n = -Vector3.Dot(ad, bd) * Vector3.Dot(bd, c) + Vector3.Dot(ad, c) * Vector3.Dot(bd, bd);
 			float d = Vector3.Dot(ad, ad) * Vector3.Dot(bd, bd) - Vector3.Dot(ad, bd) * Vector3.Dot(ad, bd);
 
-			Vector3 v = ao + ad * (n/d);
-			
-			return v;
+			return ao + ad * (n/d);
 		}
 	}
 }

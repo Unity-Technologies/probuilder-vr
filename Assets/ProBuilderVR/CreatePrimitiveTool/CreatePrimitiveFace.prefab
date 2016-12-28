@@ -1168,7 +1168,7 @@ GameObject:
   - 223: {fileID: 223000012660392470}
   - 114: {fileID: 114000012174378230}
   - 114: {fileID: 114000013693917734}
-  - 114: {fileID: 114000011062923416}
+  - 114: {fileID: 114000013569138148}
   m_Layer: 5
   m_Name: CreatePrimitiveFace
   m_TagString: Untagged
@@ -3222,20 +3222,6 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
---- !u!114 &114000011062923416
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1000012291599038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ef0e871293c7df43a978be6e5abdae6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_RunInEditMode: 0
-  m_HighlightObjects:
-  - {fileID: 1000010519325376, guid: fc7dd56df26f4634685350c0bbcc7ba1, type: 2}
 --- !u!114 &114000011152202554
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -6153,6 +6139,19 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114000013569138148
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1000012291599038}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78a1dad37675d964c98bdc512d8a1b42, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_RunInEditMode: 0
+  m_HighlightObjects: []
 --- !u!114 &114000013577255216
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -7,6 +7,9 @@ using UnityEngine.Experimental.EditorVR.Utilities;
 
 namespace ProBuilder2.VR
 {
+	/**
+	 * Set face and edge highlights on selected objects.
+	 */
 	public class HighlightElementsModule : MonoBehaviour
 	{
 		[SerializeField]
@@ -32,6 +35,9 @@ namespace ProBuilder2.VR
 			m_Highlights.Clear();
 		}
 
+		/**
+		 * Highlight a set of faces on a pb_Object.
+		 */
 		public void SetFaceHighlight(pb_Object pb, pb_Face[] faces)
 		{
 			if(pb == null)
@@ -80,6 +86,9 @@ namespace ProBuilder2.VR
 			m.normals = normals;
 		}
 
+		/**
+		 * Update the vertex positions for a pb_Object in the selection.
+		 */
 		public void UpdateVertices(pb_Object pb)
 		{
 			Mesh m = null;
