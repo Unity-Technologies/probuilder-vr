@@ -9,11 +9,11 @@ using ProBuilder2.Common;
 
 namespace ProBuilder2.VR
 {
-	[MainMenuItem("Create Primitive", "ProBuilder", "Create geometry in the scene")]
-	public class CreatePrimitiveTool : MonoBehaviour, ITool, IStandardActionMap, IConnectInterfaces, IInstantiateMenuUI, IUsesRayOrigin, IUsesSpatialHash
+	[MainMenuItem("Create Shape", "ProBuilder", "Create geometry in the scene")]
+	public class CreateShapeTool : MonoBehaviour, ITool, IStandardActionMap, IConnectInterfaces, IInstantiateMenuUI, IUsesRayOrigin, IUsesSpatialHash
 	{
 		[SerializeField]
-		CreateProBuilderPrimitiveMenu m_MenuPrefab;
+		CreateShapeMenu m_MenuPrefab;
 
 		const float kDrawDistance = 0.075f;
 
@@ -44,7 +44,7 @@ namespace ProBuilder2.VR
 		void Start()
 		{
 			m_ToolMenu = instantiateMenuUI(rayOrigin, m_MenuPrefab);
-			var menu = m_ToolMenu.GetComponent<CreateProBuilderPrimitiveMenu>();
+			var menu = m_ToolMenu.GetComponent<CreateShapeMenu>();
 			connectInterfaces(menu, rayOrigin);
 			menu.selectPrimitive = SetSelectedPrimitive;
 		}
