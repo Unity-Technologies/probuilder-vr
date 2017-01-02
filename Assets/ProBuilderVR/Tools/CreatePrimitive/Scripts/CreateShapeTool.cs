@@ -10,7 +10,7 @@ using ProBuilder2.Common;
 namespace ProBuilder2.VR
 {
 	[MainMenuItem("Create Shape", "ProBuilder", "Create geometry in the scene")]
-	public class CreateShapeTool : MonoBehaviour, ITool, IStandardActionMap, IConnectInterfaces, IInstantiateMenuUI, IUsesRayOrigin, IUsesSpatialHash
+	public class CreateShapeTool : MonoBehaviour, ITool, IStandardActionMap, IConnectInterfaces, IInstantiateMenuUI, IUsesRayOrigin, IUsesSpatialHash, IExclusiveMode
 	{
 		[SerializeField]
 		CreateShapeMenu m_ShapeMenuPrefab;
@@ -86,30 +86,6 @@ namespace ProBuilder2.VR
 			}
 		}
 
-		// void SetScalingForObjectType()
-		// {
-		// 	var corner = (m_EndPoint - m_StartPoint).magnitude;
-
-		// 	// // it feels better to scale these primitives vertically with the drawpoint
-		// 	// if (m_SelectedPrimitiveType == PrimitiveType.Capsule || m_SelectedPrimitiveType == PrimitiveType.Cylinder || m_SelectedPrimitiveType == PrimitiveType.Cube)
-		// 		m_CurrentGameObject.transform.localScale = Vector3.one * corner * 0.5f;
-		// 	// else
-		// 		// m_CurrentGameObject.transform.localScale = Vector3.one * corner;
-		// }
-
-		// void UpdatePositions()
-		// {
-		// 	m_EndPoint = rayOrigin.position + rayOrigin.forward * 1f;
-		// 	m_CurrentGameObject.transform.position = (m_StartPoint + m_EndPoint) * 0.5f;
-		// }
-
-		// void UpdateFreeformScale()
-		// {
-		// 	var maxCorner = Vector3.Max(m_StartPoint, m_EndPoint);
-		// 	var minCorner = Vector3.Min(m_StartPoint, m_EndPoint);
-		// 	m_CurrentGameObject.transform.localScale = (maxCorner - minCorner);
-		// }
-
 		void HandleFinishPoint(Standard standardInput, Action<InputControl> consumeControl)
 		{
 			if(m_CurrentShape == null)
@@ -123,7 +99,6 @@ namespace ProBuilder2.VR
 					m_State = ShapeCreationState.StartPoint;
 
 				consumeControl(standardInput.action);
-
 			}
 		}
 

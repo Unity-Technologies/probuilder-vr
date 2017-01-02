@@ -122,7 +122,7 @@ namespace ProBuilder2.VR
 			}
 			else
 			{
-				m_DraggedPoint = CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
+				m_DraggedPoint = VRMath.CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
 
 				Vector3 localDragOrigin = m_Object.transform.InverseTransformPoint(m_DragOrigin);
 				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(m_DraggedPoint);
@@ -138,20 +138,6 @@ namespace ProBuilder2.VR
 				m_Object.msh.vertices = m_SettingPositions;
 				m_HighlightModule.UpdateVertices(m_Object);
 			}
-		}
-
-		private Vector3 CalculateNearestPointRayRay(Vector3 ao, Vector3 ad, Vector3 bo, Vector3 bd)
-		{
-			// ray-ray don't do parallel
-			if(ad == bd)	
-				return ao;
-
-			Vector3 c = bo - ao;
-
-			float n = -Vector3.Dot(ad, bd) * Vector3.Dot(bd, c) + Vector3.Dot(ad, c) * Vector3.Dot(bd, bd);
-			float d = Vector3.Dot(ad, ad) * Vector3.Dot(bd, bd) - Vector3.Dot(ad, bd) * Vector3.Dot(ad, bd);
-
-			return ao + ad * (n/d);
 		}
 	}
 }
