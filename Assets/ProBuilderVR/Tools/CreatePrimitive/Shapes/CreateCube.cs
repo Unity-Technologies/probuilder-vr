@@ -13,6 +13,7 @@ namespace ProBuilder2.VR
 		private Vector3 m_StartPoint, m_EndPoint, m_BaseEndPoint, m_Size;
 		private Plane m_Plane;
 		private pb_Object m_Mesh = null;
+		private bool m_FacesReversed = false;
 
 		enum State
 		{
@@ -59,6 +60,7 @@ namespace ProBuilder2.VR
 		{
 			if(state == State.Base)
 			{
+				m_FacesReversed = false;
 				state = State.Height;
 				return true;
 			}
@@ -93,10 +95,26 @@ namespace ProBuilder2.VR
 
 				m_BaseEndPoint.x = m_EndPoint.x;
 				m_BaseEndPoint.z = m_EndPoint.z;
+				
+				bool isFlipped = !(m_Size.x < 0 ^ m_Size.z < 0);
+
+				if(isFlipped != m_FacesReversed)
+				{
+					m_FacesReversed = isFlipped;
+					m_Mesh.ReverseWindingOrder(m_Mesh.faces);
+				}
 			}
 			else
 			{
 				m_Size.y = size.y;
+
+				bool isFlipped = m_Size.y < 0;
+
+				if(isFlipped != m_FacesReversed)
+				{
+					m_FacesReversed = isFlipped;
+					m_Mesh.ReverseWindingOrder(m_Mesh.faces);
+				}
 			}
 
 			template[0] = m_StartPoint;
@@ -109,7 +127,9 @@ namespace ProBuilder2.VR
 			template[6] = new Vector3(m_StartPoint.x + m_Size.x, 	m_StartPoint.y + m_Size.y,	m_StartPoint.z + m_Size.z);
 			template[7] = new Vector3(m_StartPoint.x, 				m_StartPoint.y + m_Size.y,	m_StartPoint.z + m_Size.z);
 
-			for(int i = 0; i < pb_Constant.TRIANGLES_CUBE.Length; i++)
+			int len = pb_Constant.TRIANGLES_CUBE.Length;
+
+			for(int i = 0; i < len; i++)
 				positions[i] = template[pb_Constant.TRIANGLES_CUBE[i]];
 
 			m_Mesh.SetVertices(positions);
