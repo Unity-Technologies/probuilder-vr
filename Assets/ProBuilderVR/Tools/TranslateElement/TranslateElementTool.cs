@@ -15,8 +15,8 @@ using ProBuilder2.Common;
 
 namespace ProBuilder2.VR
 {
-	[MainMenuItem("Highlight Faces", "ProBuilder", "Highlight the face a pointer is currently hovering")]
-	public class TranslateElementTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults
+	[MainMenuItem("Move Elements", "ProBuilder", "Translate selected mesh elements.")]
+	public class TranslateElementTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults, IExclusiveMode
 	{
 		public Transform rayOrigin { get; set; }
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
@@ -42,7 +42,6 @@ namespace ProBuilder2.VR
 
 		void Start()
 		{
-			Selection.objects = new UnityEngine.Object[0];
 			m_HighlightModule = U.Object.CreateGameObjectWithComponent<HighlightElementsModule>();
 		}
 
@@ -68,9 +67,12 @@ namespace ProBuilder2.VR
 			Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
 			pb_RaycastHit hit;
 			GameObject first = getFirstGameObject(rayOrigin);
+
 			if(first == null)	
 				return;
+
 			pb_Object pb = first.GetComponent<pb_Object>();
+			
 			if(pb == null)	
 				return;
 

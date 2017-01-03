@@ -20,5 +20,20 @@ namespace ProBuilder2.VR
 
 			return ao + ad * (n/d);
 		}
+		
+		/**
+		 * Get the point on a plane that this ray intersects.
+		 */
+		public static Vector3 GetPointOnPlane(Transform rayOrigin, Plane plane)
+		{
+			Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
+
+			float hit;
+
+			if( plane.Raycast(ray, out hit) )
+				return ray.GetPoint(hit);
+			else
+				return rayOrigin.position;
+		}
 	}
 }

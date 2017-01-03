@@ -23,20 +23,5 @@ namespace ProBuilder2.VR
 				return m_GameObject;
 			}
 		}
-
-		/**
-		 * Get the point on a plane that this ray intersects.
-		 */
-		protected Vector3 GetPointOnPlane(Transform rayOrigin, Plane plane)
-		{
-			Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
-
-			float hit;
-
-			if( plane.Raycast(ray, out hit) )
-				return ray.GetPoint(hit);
-			else
-				return rayOrigin.position;
-		}
 	}
 }

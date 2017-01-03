@@ -17,6 +17,9 @@ namespace ProBuilder2.VR
 		GameObject m_ShapeMenu;
 		Shape m_Shape = Shape.Cube;
 
+		[SerializeField] GameObject m_PlaneVisualPrefab;
+		GameObject m_PlaneVisual;
+
 		public Func<Transform, IMenu, GameObject> instantiateMenuUI { private get; set; }
 		public Transform rayOrigin { get; set; }
 		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
@@ -41,6 +44,9 @@ namespace ProBuilder2.VR
 			var menu = m_ShapeMenu.GetComponent<CreateShapeMenu>();
 			connectInterfaces(menu, rayOrigin);
 			menu.selectPrimitive = SetSelectedPrimitive;
+
+			m_PlaneVisual = U.Object.Instantiate(m_PlaneVisualPrefab);
+			m_PlaneVisual.SetActive(false);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -69,6 +75,10 @@ namespace ProBuilder2.VR
 
 		void HandleStartPoint(Standard standardInput, Action<InputControl> consumeControl)
 		{
+			Vector3 p = VRMath.GetPointOnPlane(rayOrigin, m_Plane);
+			m_PlaneVisual.SetActive(true);
+			m_PlaneVisual.transform.position = p;
+
 			if (standardInput.action.wasJustPressed)
 			{
 				switch(m_Shape)
@@ -105,6 +115,7 @@ namespace ProBuilder2.VR
 		void OnDestroy()
 		{
 			U.Object.Destroy(m_ShapeMenu);	
+			U.Object.Destroy(m_PlaneVisual);	
 		}
 	}
 }

@@ -5,6 +5,7 @@
 /[Bb]uilds/
 /Assets/AssetStoreTools*
 /Assets/Debug*
+/Assets/Shaderforge*
 /Assets/*.unity
 /Assets/*.unity.meta
 

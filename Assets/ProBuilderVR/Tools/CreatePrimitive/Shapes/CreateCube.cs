@@ -26,7 +26,7 @@ namespace ProBuilder2.VR
 		public override bool HandleStart(Transform rayOrigin, Plane drawPlane)
 		{
 			m_Plane = drawPlane;
-			m_StartPoint = GetPointOnPlane(rayOrigin, drawPlane);
+			m_StartPoint = VRMath.GetPointOnPlane(rayOrigin, drawPlane);
 			m_EndPoint = m_StartPoint;
 
 			m_Mesh = pb_ShapeGenerator.CubeGenerator(Vector3.one);
@@ -49,7 +49,7 @@ namespace ProBuilder2.VR
 		public override void HandleDrag(Transform rayOrigin)
 		{
 			if(state == State.Base)
-				m_EndPoint = GetPointOnPlane(rayOrigin, m_Plane);
+				m_EndPoint = VRMath.GetPointOnPlane(rayOrigin, m_Plane);
 			else
 				m_EndPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
 
