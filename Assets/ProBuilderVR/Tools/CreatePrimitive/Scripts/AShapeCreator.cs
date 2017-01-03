@@ -7,7 +7,7 @@ namespace ProBuilder2.VR
 	 * Shape creation base class.  All functions return True if they still require
 	 * input, false if creation is finished.
 	 */
-	public abstract class ProBuilderShapeInstantiator
+	public abstract class AShapeCreator
 	{
 		protected GameObject m_GameObject;
 

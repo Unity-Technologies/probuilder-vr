@@ -47,6 +47,8 @@
 				sampler2D _MainTex;
 				float4 _MainTex_ST;
 				fixed4 _Color;
+				float _RotateTime;
+
 				#define DEG2RAD 0.01745329252
 				
 				v2f vert (appdata_t v)
@@ -74,7 +76,7 @@
 
 				fixed4 frag (v2f i) : COLOR
 				{
-					fixed4 col = tex2D(_MainTex, i.texcoord) * float4(rotate(i.texcoord.xy, _Time.x * 360), .2, 1);
+					fixed4 col = tex2D(_MainTex, i.texcoord) * float4(rotate(i.texcoord.xy, (_RotateTime * .3) * 360), .2, 1);
 					return col;
 				}
 			ENDCG

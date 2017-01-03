@@ -4,9 +4,9 @@ using ProBuilder2.MeshOperations;
 
 namespace ProBuilder2.VR
 {
-	public class CreateCube : ProBuilderShapeInstantiator
+	public class CreateCube : AShapeCreator
 	{
-		const float MIN_SIZE = .1f;
+		const float MIN_SIZE = .01f;
 
 		private Vector3[] template = new Vector3[8];
 		private Vector3[] positions = new Vector3[24];
@@ -26,7 +26,10 @@ namespace ProBuilder2.VR
 		public override bool HandleStart(Transform rayOrigin, Plane drawPlane)
 		{
 			m_Plane = drawPlane;
-			m_StartPoint = VRMath.GetPointOnPlane(rayOrigin, drawPlane);
+
+			if(!VRMath.GetPointOnPlane(rayOrigin, drawPlane, out m_StartPoint))
+				return false;
+
 			m_EndPoint = m_StartPoint;
 
 			m_Mesh = pb_ShapeGenerator.CubeGenerator(Vector3.one);
@@ -49,7 +52,7 @@ namespace ProBuilder2.VR
 		public override void HandleDrag(Transform rayOrigin)
 		{
 			if(state == State.Base)
-				m_EndPoint = VRMath.GetPointOnPlane(rayOrigin, m_Plane);
+				VRMath.GetPointOnPlane(rayOrigin, m_Plane, out m_EndPoint);
 			else
 				m_EndPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
 

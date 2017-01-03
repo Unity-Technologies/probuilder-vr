@@ -35,7 +35,7 @@ namespace ProBuilder2.VR
 		// shape creation vars
 		ShapeCreationState m_State = ShapeCreationState.StartPoint;
 		GameObject m_CurrentGameObject;
-		ProBuilderShapeInstantiator m_CurrentShape;
+		AShapeCreator m_CurrentShape;
 		Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
 
 		void Start()
@@ -75,9 +75,20 @@ namespace ProBuilder2.VR
 
 		void HandleStartPoint(Standard standardInput, Action<InputControl> consumeControl)
 		{
-			Vector3 p = VRMath.GetPointOnPlane(rayOrigin, m_Plane);
-			m_PlaneVisual.SetActive(true);
-			m_PlaneVisual.transform.position = p;
+			if(m_PlaneVisual == null)
+				return;
+
+			Vector3 p;
+
+			if( VRMath.GetPointOnPlane(rayOrigin, m_Plane, out p) )
+			{
+				m_PlaneVisual.SetActive(true);
+				m_PlaneVisual.transform.position = p;
+			}
+			else
+			{
+				m_PlaneVisual.SetActive(false);
+			}
 
 			if (standardInput.action.wasJustPressed)
 			{
@@ -88,11 +99,12 @@ namespace ProBuilder2.VR
 						break;
 				}
 				
-				m_CurrentShape.HandleStart(rayOrigin, m_Plane);
-
-				m_State = ShapeCreationState.EndPoint;
-				addToSpatialHash(m_CurrentShape.gameObject);
-				consumeControl(standardInput.action);
+				if( m_CurrentShape.HandleStart(rayOrigin, m_Plane) )
+				{
+					m_State = ShapeCreationState.EndPoint;
+					addToSpatialHash(m_CurrentShape.gameObject);
+					consumeControl(standardInput.action);
+				}
 			}
 		}
 
