@@ -10,7 +10,15 @@ using ProBuilder2.Common;
 namespace ProBuilder2.VR
 {
 	[MainMenuItem("Create Shape", "ProBuilder", "Create geometry in the scene")]
-	public class CreateShapeTool : MonoBehaviour, ITool, IStandardActionMap, IConnectInterfaces, IInstantiateMenuUI, IUsesRayOrigin, IUsesSpatialHash, IExclusiveMode
+	public class CreateShapeTool : 	MonoBehaviour,
+									ITool, 
+									IStandardActionMap,
+									IConnectInterfaces,
+									IInstantiateMenuUI,
+									IUsesRayOrigin,
+									IUsesSpatialHash,
+									IExclusiveMode, 
+									IUsesViewerPivot
 	{
 		[SerializeField]
 		CreateShapeMenu m_ShapeMenuPrefab;
@@ -22,6 +30,7 @@ namespace ProBuilder2.VR
 
 		public Func<Transform, IMenu, GameObject> instantiateMenuUI { private get; set; }
 		public Transform rayOrigin { get; set; }
+		public Transform viewerPivot { get; set; }
 		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
 		public Action<GameObject> addToSpatialHash { get; set; }
 		public Action<GameObject> removeFromSpatialHash { get; set; }

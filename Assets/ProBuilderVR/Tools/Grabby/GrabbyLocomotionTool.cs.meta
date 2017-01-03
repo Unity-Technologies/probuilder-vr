@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0503ac5f1a9663a4485c8342ec7b8fa2
+timeCreated: 1483470380
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - m_DirectManipulator: {fileID: 114000012600325142, guid: 2c9cb3514c0379a418a813f8418d1dc3,
+      type: 2}
+  - m_GrabbyActionMap: {fileID: 11400000, guid: 9933637995ebc6248b7bc44f00ab3bbc,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
