@@ -32,13 +32,10 @@ namespace ProBuilder2.VR
 		[SerializeField]
 		private ActionMap m_GrabbyActionMap;
 
-		private Transform m_GrabTarget = null;
-		private Vector3 m_PositionOffset;
-		private Quaternion m_RotationOffset;
+		private Vector3 m_GrabTarget = Vector3.zero;
 		private bool m_GrabbyEngaged = false;
-
-		private Vector3 m_OriginPosition;
-		private Quaternion m_OriginRotation;
+		private float m_DistanceFromTarget = 0f;
+		private Vector3 m_LastRay = Vector3.up;
 
 		void Start()
 		{
@@ -73,43 +70,30 @@ namespace ProBuilder2.VR
 				Dragging();
 		}
 
-		void Translate(Vector3 delta) {
-			m_GrabTarget.transform.position += delta;
-		}
-
-		void Rotate(Quaternion delta) {
-			m_GrabTarget.transform.rotation *= delta;
-		}
-
 		void DragStart(Transform target)
 		{
-			m_OriginPosition = target.position;
-			m_OriginRotation = target.rotation;
-
-			m_GrabTarget = target;
-			var inverseRotation = Quaternion.Inverse(rayOrigin.rotation);
-			m_PositionOffset = inverseRotation * (m_GrabTarget.transform.position - rayOrigin.position);
-			m_RotationOffset = inverseRotation * m_GrabTarget.transform.rotation;
+			m_GrabTarget = target.GetComponent<MeshRenderer>().bounds.center;
+			m_DistanceFromTarget = Vector3.Distance(viewerPivot.position, target.position);
+			m_LastRay = rayOrigin.forward;
 		}
 
 		void Dragging()
 		{
-			Translate(rayOrigin.position + rayOrigin.rotation * m_PositionOffset - m_GrabTarget.position);
-			Rotate(Quaternion.Inverse(m_GrabTarget.rotation) * rayOrigin.rotation * m_RotationOffset);
+			float angle = Vector3.Angle(m_LastRay, rayOrigin.forward);
+
+			Vector3 cross = Vector3.Cross(m_LastRay, Vector3.up);
+
+			if(Vector3.Dot(rayOrigin.forward, cross) > 0f)
+				angle = -angle;
+
+			viewerPivot.RotateAround(m_GrabTarget, Vector3.up, angle);
+
+			m_LastRay = rayOrigin.forward;
 		}
 
 		void DragEnd()
 		{
 			m_GrabbyEngaged = false;
-
-			Vector3 p = m_OriginPosition - m_GrabTarget.position;
-			Quaternion r = Quaternion.Inverse(m_OriginRotation) * m_GrabTarget.rotation;
-
-			m_GrabTarget.position = m_OriginPosition;
-			m_GrabTarget.rotation = m_OriginRotation;
-
-			viewerPivot.rotation = viewerPivot.rotation * r;
-			viewerPivot.position += p;
 		}
 	}
 }
