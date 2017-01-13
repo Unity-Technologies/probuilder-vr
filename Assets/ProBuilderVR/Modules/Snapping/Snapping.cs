@@ -5,7 +5,9 @@ namespace ProBuilder2.VR
 	public static class Snapping
 	{
 		const float EPSILON = .0001f;
-			
+
+		public const float DEFAULT_INCREMENT = 1/16f;
+
 		public static float Snap(float val, float round)
 		{
 			return round * Mathf.Round(val / round);

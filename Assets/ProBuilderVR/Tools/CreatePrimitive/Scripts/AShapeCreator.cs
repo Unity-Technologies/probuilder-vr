@@ -11,7 +11,7 @@ namespace ProBuilder2.VR
 	{
 		protected GameObject m_GameObject;
 
-		protected static float m_SnapIncrement = 1/16f;
+		protected static float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
 
 		public static void SetSnapIncrement(float inc)
 		{

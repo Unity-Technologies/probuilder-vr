@@ -16,12 +16,17 @@ using ProBuilder2.Common;
 namespace ProBuilder2.VR
 {
 	[MainMenuItem("Move Elements", "ProBuilder", "Translate selected mesh elements.")]
-	public class TranslateElementTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults, IExclusiveMode
+	public class TranslateElementTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults, ISetHighlight
 	{
 		public Transform rayOrigin { get; set; }
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
+		public Action<GameObject, bool> setHighlight { get; set; }
+
 		private HighlightElementsModule m_HighlightModule = null;
 		const float MAX_TRANSLATE_DISTANCE = 100f;
+		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
+		private float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
+		private Vector3 m_PreviousLinePosition = Vector3.zero;
 
 	   	enum CreateState
 	   	{
@@ -30,6 +35,7 @@ namespace ProBuilder2.VR
 	   	}
 
 	   	CreateState m_State = CreateState.Start;
+	   	bool m_Dragging = false;
 	   	Vector3 m_DragOrigin = Vector3.zero;
 		Vector3 m_DragDirection = Vector3.zero;
 		Vector3 m_DraggedPoint = Vector3.zero;
@@ -80,6 +86,8 @@ namespace ProBuilder2.VR
 			{
 				m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] } );
 
+				consumeControl(input.action);
+
 				if(!input.action.wasJustPressed)
 					return;
 
@@ -99,8 +107,6 @@ namespace ProBuilder2.VR
 				System.Array.Copy(pb.vertices, m_SettingPositions, pb.vertexCount);
 
 				m_Object.ToMesh();
-
-				consumeControl(input.action);
 			}
 			else
 			{
@@ -113,25 +119,32 @@ namespace ProBuilder2.VR
 			// Ready for next object to be created
 			if (input.action.wasJustReleased)
 			{
-				m_HighlightModule.SetFaceHighlight(m_Object, null);
-
+				m_Dragging = false;
 				m_State = CreateState.Start;
-
+				m_HighlightModule.SetFaceHighlight(m_Object, null);
 				m_Object.ToMesh();
 				m_Object.Refresh();
-
-				consumeControl(input.action);
 			}
 			else
 			{
 				m_DraggedPoint = VRMath.CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
 
+				if(!m_Dragging)
+				{
+					m_PreviousLinePosition = m_DraggedPoint;	
+					m_Dragging = true;
+				}
+
+				Vector3 smoothedDragPoint = Vector3.Lerp(m_PreviousLinePosition, m_DraggedPoint, .5f);
 				Vector3 localDragOrigin = m_Object.transform.InverseTransformPoint(m_DragOrigin);
-				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(m_DraggedPoint);
+				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(smoothedDragPoint);
 				Vector3 dir = localDraggedPoint - localDragOrigin;
+				m_PreviousLinePosition = m_DraggedPoint;
 
 				if(dir.magnitude > MAX_TRANSLATE_DISTANCE)
 					dir = dir.normalized * MAX_TRANSLATE_DISTANCE;
+
+				dir = Snapping.Snap(dir, m_SnapIncrement, VECTOR3_ONE);
 
 				foreach(int ind in m_SelectedIndices)
 					m_SettingPositions[ind] = m_Positions[ind] + dir;
@@ -140,6 +153,8 @@ namespace ProBuilder2.VR
 				m_Object.msh.vertices = m_SettingPositions;
 				m_HighlightModule.UpdateVertices(m_Object);
 			}
+			
+			consumeControl(input.action);
 		}
 	}
 }
