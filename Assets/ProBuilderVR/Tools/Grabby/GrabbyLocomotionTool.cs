@@ -34,7 +34,6 @@ namespace ProBuilder2.VR
 
 		private Vector3 m_GrabTarget = Vector3.zero;
 		private bool m_GrabbyEngaged = false;
-		private float m_DistanceFromTarget = 0f;
 		private Vector3 m_LastRay = Vector3.up;
 
 		void Start()
@@ -73,7 +72,6 @@ namespace ProBuilder2.VR
 		void DragStart(Transform target)
 		{
 			m_GrabTarget = target.GetComponent<MeshRenderer>().bounds.center;
-			m_DistanceFromTarget = Vector3.Distance(viewerPivot.position, target.position);
 			m_LastRay = rayOrigin.forward;
 		}
 
