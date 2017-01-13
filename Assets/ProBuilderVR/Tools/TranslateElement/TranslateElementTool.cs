@@ -85,6 +85,7 @@ namespace ProBuilder2.VR
 			if( pb_HandleUtility.FaceRaycast(ray, pb, out hit) )
 			{
 				m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] } );
+				setHighlight(pb.gameObject, false);
 
 				consumeControl(input.action);
 
@@ -151,9 +152,11 @@ namespace ProBuilder2.VR
 
 				m_Object.SetVertices(m_SettingPositions);
 				m_Object.msh.vertices = m_SettingPositions;
+				m_Object.RefreshUV();
 				m_HighlightModule.UpdateVertices(m_Object);
 			}
 			
+			setHighlight(m_Object.gameObject, false);
 			consumeControl(input.action);
 		}
 	}

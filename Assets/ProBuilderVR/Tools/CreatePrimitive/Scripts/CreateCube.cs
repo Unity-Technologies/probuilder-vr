@@ -35,6 +35,10 @@ namespace ProBuilder2.VR
 			m_StartPoint = m_EndPoint;
 
 			m_Mesh = pb_ShapeGenerator.CubeGenerator(VECTOR3_ONE);
+
+			foreach(pb_Face face in m_Mesh.faces)
+				face.uv.useWorldSpace = true;
+
 			m_GameObject = m_Mesh.gameObject;
 
 			// we'll place vertex positions in world space while drawing
@@ -53,11 +57,15 @@ namespace ProBuilder2.VR
 
 		public override void HandleDrag(Transform rayOrigin)
 		{
-			if(state == State.Base)
-				VRMath.GetPointOnPlane(rayOrigin, m_Plane, out m_EndPoint);
-			else
-				m_EndPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
+			Vector3 endPoint;
 
+			if(state == State.Base)
+				VRMath.GetPointOnPlane(rayOrigin, m_Plane, out endPoint);
+			else
+				endPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
+
+			// Apply simple smoothing to ray input.
+			m_EndPoint = Vector3.Lerp(m_EndPoint, endPoint, .5f);
 			m_EndPoint = Snapping.Snap(m_EndPoint, m_SnapIncrement, VECTOR3_ONE);
 
 			UpdateShape();

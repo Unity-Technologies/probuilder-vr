@@ -363,6 +363,7 @@ PlayerSettings:
   spritePackerPolicy: 
   scriptingDefineSymbols:
     1: UNITY_CCU;ENABLE_STEAMVR_INPUT;ENABLE_OVR_INPUT
+    14: UNITY_CCU;ENABLE_OVR_INPUT;ENABLE_STEAMVR_INPUT
   metroPackageName: probuilder-vr
   metroPackageVersion: 
   metroCertificatePath: 
@@ -455,7 +456,7 @@ PlayerSettings:
   - iOS::VR::enable
   - tvOS::VR::enable
   Android::VR::enable: 0
-  Metro::VR::enable: 0
+  Metro::VR::enable: 1
   N3DS::VR::enable: 0
   PS3::VR::enable: 0
   PS4::VR::enable: 0

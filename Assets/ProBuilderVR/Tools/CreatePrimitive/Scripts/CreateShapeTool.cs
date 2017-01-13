@@ -92,7 +92,7 @@ namespace ProBuilder2.VR
 			if( VRMath.GetPointOnPlane(rayOrigin, m_Plane, out p) )
 			{
 				m_PlaneVisual.SetActive(true);
-				m_PlaneVisual.transform.position = p;
+				m_PlaneVisual.transform.position = Snapping.Snap(p, Snapping.DEFAULT_INCREMENT, Vector3.one);
 			}
 			else
 			{

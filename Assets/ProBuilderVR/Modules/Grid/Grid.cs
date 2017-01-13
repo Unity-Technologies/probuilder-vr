@@ -1,33 +1,87 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
+﻿/**
+ * Renders a line grid.
+ */
 
-namespace ProBuilder2.VR
+using UnityEngine;
+using System.Collections;
+
+namespace ProBuilder.VR
 {
-	[RequireComponent(typeof(LineSegmentRenderer))]
+	[RequireComponent(typeof(MeshFilter))]
+	[RequireComponent(typeof(MeshRenderer))]
 	public class Grid : MonoBehaviour
 	{
+		// Default to 10x10 grid
+		public int lines = 10;
+		
+		// 1m * scale
+		public float scale = .25f;
+		public Color gridColor = new Color(.5f, .5f, .5f, .6f);
+		public Material gridMaterial;
 
 		void Start()
 		{
-			List<Vector3> positions = new List<Vector3>();
+			GetComponent<MeshFilter>().sharedMesh = GridMesh(lines, scale);
+			transform.position = Vector3.zero;
+		}
 
-			int count = 11;
-			float size = 10f;
-			float half = size * .5f;
+		void OnDestroy()
+		{
+			Mesh m = GetComponent<MeshFilter>().sharedMesh;
+			if(m != null)
+				Object.DestroyImmediate(m);
+		}
 
-			for(int i = 0; i < count; i++)
+		/**
+		 * Builds a grid object in 2d space
+		 */
+		Mesh GridMesh(int lineCount, float scale)
+		{
+			float half = (lineCount/2f) * scale;
+
+			// to make grid lines equal and such
+			lineCount++;
+
+			Vector3[] lines = new Vector3[lineCount * 4];	// 2 vertices per line, 2 * lines per grid
+			Vector3[] normals = new Vector3[lineCount * 4];
+			Vector2[] uv = new Vector2[lineCount * 4];
+			int[] indices = new int[lineCount * 4];
+
+			int n = 0;
+			for(int y = 0; y < lineCount; y++)
 			{
-				float nrm = i / (count - 1f);
+				indices[n] = n;
+				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
+				lines[n++] = new Vector3( y * scale - half, 0f, -half );
 
-				positions.Add(new Vector3(-half, 0f, -half + nrm * size));
-				positions.Add(new Vector3( half, 0f, -half + nrm * size));
+				indices[n] = n;
+				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
+				lines[n++] = new Vector3( y * scale - half, 0f,  half );
 
-				positions.Add(new Vector3(-half + nrm * size, 0f, -half));
-				positions.Add(new Vector3(-half + nrm * size, 0f,  half));
+				indices[n] = n;
+				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
+				lines[n++] = new Vector3( -half, 0f, y * scale - half );
+
+				indices[n] = n;
+				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
+				lines[n++] = new Vector3(  half, 0f, y * scale - half );
+			}		
+
+			for(int i = 0; i < lines.Length; i++)
+			{
+				normals[i] = Vector3.up;
 			}
 
-			GetComponent<LineSegmentRenderer>().SetPositions(positions.ToArray());
+			Mesh tm = new Mesh();
+
+			tm.name = "GridMesh";
+			tm.vertices = lines;
+			tm.normals = normals;
+			tm.subMeshCount = 1;
+			tm.SetIndices(indices, MeshTopology.Lines, 0);
+			tm.uv = uv;
+
+			return tm;
 		}
 	}
 }
