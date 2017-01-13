@@ -128,9 +128,9 @@ namespace ProBuilder2.VR
 			{
 				if(!m_CurrentShape.HandleTriggerRelease(rayOrigin))
 					m_State = ShapeCreationState.StartPoint;
-
-				consumeControl(standardInput.action);
 			}
+			
+			consumeControl(standardInput.action);
 		}
 
 		void OnDestroy()

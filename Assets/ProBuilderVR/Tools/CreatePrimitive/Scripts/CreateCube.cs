@@ -14,6 +14,7 @@ namespace ProBuilder2.VR
 		private Plane m_Plane;
 		private pb_Object m_Mesh = null;
 		private bool m_FacesReversed = false;
+		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
 
 		enum State
 		{
@@ -30,9 +31,10 @@ namespace ProBuilder2.VR
 			if(!VRMath.GetPointOnPlane(rayOrigin, drawPlane, out m_StartPoint))
 				return false;
 
-			m_EndPoint = m_StartPoint;
+			m_EndPoint = Snapping.Snap(m_StartPoint, m_SnapIncrement, VECTOR3_ONE);
+			m_StartPoint = m_EndPoint;
 
-			m_Mesh = pb_ShapeGenerator.CubeGenerator(Vector3.one);
+			m_Mesh = pb_ShapeGenerator.CubeGenerator(VECTOR3_ONE);
 			m_GameObject = m_Mesh.gameObject;
 
 			// we'll place vertex positions in world space while drawing
@@ -56,6 +58,8 @@ namespace ProBuilder2.VR
 			else
 				m_EndPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
 
+			m_EndPoint = Snapping.Snap(m_EndPoint, m_SnapIncrement, VECTOR3_ONE);
+
 			UpdateShape();
 		}
 
@@ -69,6 +73,7 @@ namespace ProBuilder2.VR
 			}
 			else
 			{
+				m_Mesh.CenterPivot(null);
 				state = State.Base;
 				return false;
 			}

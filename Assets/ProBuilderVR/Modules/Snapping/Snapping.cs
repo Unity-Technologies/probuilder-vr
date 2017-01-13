@@ -24,7 +24,7 @@ namespace ProBuilder2.VR
 		/**
 		 * Snap a Vector3 to the nearest on-grid point.
 		 */
-		public static Vector3 Snap(Vector3 val, float snapValue, Vector3 mask = default(Vector3))
+		public static Vector3 Snap(Vector3 val, float snapValue, Vector3 mask)
 		{
 			float _x = val.x, _y = val.y, _z = val.z;
 
