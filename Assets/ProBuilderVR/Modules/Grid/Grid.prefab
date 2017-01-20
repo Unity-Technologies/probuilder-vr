@@ -55,7 +55,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: faa436616f2c74f4eaf16fc4ec6bbe37, type: 2}
   m_SubsetIndices: 
   m_StaticBatchRoot: {fileID: 0}
   m_ProbeAnchor: {fileID: 0}
@@ -90,7 +90,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_RunInEditMode: 0
-  lines: 10
-  scale: 1
-  gridColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.6}
-  gridMaterial: {fileID: 0}
+  lines: 30
+  gridColor:
+    serializedVersion: 2
+    rgba: 1331913571
+  centerColor:
+    serializedVersion: 2
+    rgba: 3539969835

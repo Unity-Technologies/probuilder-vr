@@ -5,19 +5,16 @@
 using UnityEngine;
 using System.Collections;
 
-namespace ProBuilder.VR
+namespace ProBuilder2.VR
 {
 	[RequireComponent(typeof(MeshFilter))]
 	[RequireComponent(typeof(MeshRenderer))]
 	public class Grid : MonoBehaviour
 	{
-		// Default to 10x10 grid
-		public int lines = 10;
-		
-		// 1m * scale
-		public float scale = .25f;
-		public Color gridColor = new Color(.5f, .5f, .5f, .6f);
-		public Material gridMaterial;
+		public int lines = 32;
+		private float scale = Snapping.DEFAULT_INCREMENT;
+		public Color32 gridColor = new Color32(99, 99, 99, 128);
+		public Color32 centerColor = new Color32(99, 99, 99, 210);
 
 		void Start()
 		{
@@ -28,6 +25,7 @@ namespace ProBuilder.VR
 		void OnDestroy()
 		{
 			Mesh m = GetComponent<MeshFilter>().sharedMesh;
+
 			if(m != null)
 				Object.DestroyImmediate(m);
 		}
@@ -43,40 +41,39 @@ namespace ProBuilder.VR
 			lineCount++;
 
 			Vector3[] lines = new Vector3[lineCount * 4];	// 2 vertices per line, 2 * lines per grid
-			Vector3[] normals = new Vector3[lineCount * 4];
 			Vector2[] uv = new Vector2[lineCount * 4];
+			Color32[] color = new Color32[lineCount * 4];
 			int[] indices = new int[lineCount * 4];
 
 			int n = 0;
-			for(int y = 0; y < lineCount; y++)
+			for(int xx = 0; xx < lineCount; xx++)
 			{
 				indices[n] = n;
-				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
-				lines[n++] = new Vector3( y * scale - half, 0f, -half );
+				uv[n] = new Vector2(xx / (float)(lineCount-1), 0f);
+				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
+				lines[n++] = new Vector3( xx * scale - half, 0f, -half );
 
 				indices[n] = n;
-				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
-				lines[n++] = new Vector3( y * scale - half, 0f,  half );
+				uv[n] = new Vector2(xx / (float)(lineCount-1), 1f);
+				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
+				lines[n++] = new Vector3( xx * scale - half, 0f,  half );
 
 				indices[n] = n;
-				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
-				lines[n++] = new Vector3( -half, 0f, y * scale - half );
+				uv[n] = new Vector2(0f, xx / (float)(lineCount-1));
+				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
+				lines[n++] = new Vector3( -half, 0f, xx * scale - half );
 
 				indices[n] = n;
-				uv[n] = y % 10 == 0 ? Vector2.one : Vector2.zero;
-				lines[n++] = new Vector3(  half, 0f, y * scale - half );
-			}		
-
-			for(int i = 0; i < lines.Length; i++)
-			{
-				normals[i] = Vector3.up;
+				uv[n] = new Vector2(1f, xx / (float)(lineCount-1));
+				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
+				lines[n++] = new Vector3(  half, 0f, xx * scale - half );
 			}
 
 			Mesh tm = new Mesh();
 
 			tm.name = "GridMesh";
 			tm.vertices = lines;
-			tm.normals = normals;
+			tm.colors32 = color;
 			tm.subMeshCount = 1;
 			tm.SetIndices(indices, MeshTopology.Lines, 0);
 			tm.uv = uv;
