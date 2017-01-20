@@ -18,8 +18,20 @@ namespace ProBuilder2.VR
 			m_SnapIncrement = inc < 0f ? 0f : inc;
 		}
 
+		/**
+		 * Begin drawing a shape.  If HandleStart returns false no GameObject has been created
+		 * and drawing has been aborted.
+		 */
 		public abstract bool HandleStart(Transform rayOrigin, Plane drawPlane);
+
+		/**
+		 * Handle drags after starting shape creation.
+		 */
 		public abstract void HandleDrag(Transform rayOrigin);
+
+		/**
+		 * Finalize the shape.
+		 */
 		public abstract bool HandleTriggerRelease(Transform rayOrigin);
 
 		/**

@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 70b47b7ac7f46e04b98822c5614ae421
-timeCreated: 1484337761
+timeCreated: 1484940387
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
@@ -8,6 +8,8 @@ MonoImporter:
   - m_ShapeMenuPrefab: {fileID: 114000012271056484, guid: 48dc170f610071a40b20905b1f88994c,
       type: 2}
   - m_PlaneVisualPrefab: {fileID: 1000013369477532, guid: a98d96423df261b40b993ed8ecc91717,
+      type: 2}
+  - m_DebugCubePrefab: {fileID: 1000014161969532, guid: 720927d61f773c545b17ae6b8de1c03f,
       type: 2}
   executionOrder: 0
   icon: {instanceID: 0}

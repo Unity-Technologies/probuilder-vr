@@ -15,6 +15,7 @@ namespace ProBuilder2.VR
 		private pb_Object m_Mesh = null;
 		private bool m_FacesReversed = false;
 		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
+		private Quaternion m_Orientation = Quaternion.identity;
 
 		enum State
 		{
@@ -27,8 +28,9 @@ namespace ProBuilder2.VR
 		public override bool HandleStart(Transform rayOrigin, Plane drawPlane)
 		{
 			m_Plane = drawPlane;
+			m_Orientation = Quaternion.Inverse(Quaternion.LookRotation(Vector3.up)) * Quaternion.LookRotation(m_Plane.normal);
 
-			if(!VRMath.GetPointOnPlane(rayOrigin, drawPlane, out m_StartPoint))
+			if(!VRMath.GetPointOnPlane(rayOrigin, m_Plane, out m_StartPoint))
 				return false;
 
 			m_EndPoint = Snapping.Snap(m_StartPoint, m_SnapIncrement, VECTOR3_ONE);
@@ -47,8 +49,6 @@ namespace ProBuilder2.VR
 			m_Size.x = MIN_SIZE;
 			m_Size.y = MIN_SIZE;
 			m_Size.z = MIN_SIZE;
-
-			m_BaseEndPoint.y = (drawPlane.normal * drawPlane.distance).y;
 
 			UpdateShape();
 
@@ -77,6 +77,7 @@ namespace ProBuilder2.VR
 			{
 				m_FacesReversed = false;
 				state = State.Height;
+				m_BaseEndPoint = m_EndPoint;
 				return true;
 			}
 			else
@@ -92,56 +93,54 @@ namespace ProBuilder2.VR
 			/**
 			 * How pb_Constant.CUBE_VERTICES arranges the template
 			 *
-			 *     4----5 
-			 *    /    /|
-			 *   /    / |
-			 *  7----6  1   
-			 *  |    | /
-			 *  |    |/
-			 *  3----2
+			 *     4-------5 
+			 *    /       /|
+			 *   /       / |
+			 *  7-------6  1   
+			 *  |       | /
+			 *  |       |/
+			 *  3-------2
 			 *
 			 */
 
 			Vector3 size = m_EndPoint - m_StartPoint;
+			m_Size = size;
 
-			if(state == State.Base)
-			{
-				m_Size.x = size.x;
-				m_Size.z = size.z;
+			// if(state == State.Base)
+			// {
+			// 	m_Size.x = size.x;
+			// 	m_Size.z = size.z;
 
-				m_BaseEndPoint.x = m_EndPoint.x;
-				m_BaseEndPoint.z = m_EndPoint.z;
-				
-				bool isFlipped = !(m_Size.x < 0 ^ m_Size.z < 0);
+			// 	bool isFlipped = !(m_Size.x < 0 ^ m_Size.z < 0);
 
-				if(isFlipped != m_FacesReversed)
-				{
-					m_FacesReversed = isFlipped;
-					m_Mesh.ReverseWindingOrder(m_Mesh.faces);
-				}
-			}
-			else
-			{
-				m_Size.y = size.y;
+			// 	if(isFlipped != m_FacesReversed)
+			// 	{
+			// 		m_FacesReversed = isFlipped;
+			// 		m_Mesh.ReverseWindingOrder(m_Mesh.faces);
+			// 	}
+			// }
+			// else
+			// {
+			// 	m_Size.y = size.y;
 
-				bool isFlipped = m_Size.y < 0;
+			// 	bool isFlipped = m_Size.y < 0;
 
-				if(isFlipped != m_FacesReversed)
-				{
-					m_FacesReversed = isFlipped;
-					m_Mesh.ReverseWindingOrder(m_Mesh.faces);
-				}
-			}
+			// 	if(isFlipped != m_FacesReversed)
+			// 	{
+			// 		m_FacesReversed = isFlipped;
+			// 		m_Mesh.ReverseWindingOrder(m_Mesh.faces);
+			// 	}
+			// }
 
 			template[0] = m_StartPoint;
-			template[1] = new Vector3(m_StartPoint.x + m_Size.x, 	m_StartPoint.y, m_StartPoint.z);
-			template[2] = new Vector3(m_StartPoint.x + m_Size.x, 	m_StartPoint.y, m_StartPoint.z + m_Size.z);
-			template[3] = new Vector3(m_StartPoint.x, 				m_StartPoint.y,	m_StartPoint.z + m_Size.z);
+			template[1] = m_StartPoint + Vector3.Scale(new Vector3(1f, 0f, 0f), m_Size);
+			template[2] = m_StartPoint + Vector3.Scale(new Vector3(1f, 0f, 1f), m_Size);
+			template[3] = m_StartPoint + Vector3.Scale(new Vector3(0f, 0f, 1f), m_Size);
 
-			template[4] = new Vector3(m_StartPoint.x, 				m_StartPoint.y + m_Size.y, 	m_StartPoint.z);
-			template[5] = new Vector3(m_StartPoint.x + m_Size.x, 	m_StartPoint.y + m_Size.y,	m_StartPoint.z);
-			template[6] = new Vector3(m_StartPoint.x + m_Size.x, 	m_StartPoint.y + m_Size.y,	m_StartPoint.z + m_Size.z);
-			template[7] = new Vector3(m_StartPoint.x, 				m_StartPoint.y + m_Size.y,	m_StartPoint.z + m_Size.z);
+			template[4] = m_StartPoint + Vector3.Scale(new Vector3(0f, 1f, 0f), m_Size);
+			template[5] = m_StartPoint + Vector3.Scale(new Vector3(1f, 1f, 0f), m_Size);
+			template[6] = m_StartPoint + Vector3.Scale(new Vector3(1f, 1f, 1f), m_Size);
+			template[7] = m_StartPoint + Vector3.Scale(new Vector3(0f, 1f, 1f), m_Size);
 
 			int len = pb_Constant.TRIANGLES_CUBE.Length;
 

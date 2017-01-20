@@ -70,8 +70,6 @@ namespace ProBuilder2.VR
 
 		private void HandleStart(Standard input, Action<InputControl> consumeControl)
 		{
-			Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
-			pb_RaycastHit hit;
 			GameObject first = getFirstGameObject(rayOrigin);
 
 			if(first == null)	
@@ -82,7 +80,9 @@ namespace ProBuilder2.VR
 			if(pb == null)	
 				return;
 
-			if( pb_HandleUtility.FaceRaycast(ray, pb, out hit) )
+			pb_RaycastHit hit;
+
+			if( pb_HandleUtility.FaceRaycast(new Ray(rayOrigin.position, rayOrigin.forward), pb, out hit) )
 			{
 				m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] } );
 				setHighlight(pb.gameObject, false);

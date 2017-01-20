@@ -16,6 +16,7 @@ namespace ProBuilder2.VR
 									IConnectInterfaces,
 									IInstantiateMenuUI,
 									IUsesRayOrigin,
+									IUsesRaycastResults,
 									IUsesSpatialHash,
 									IExclusiveMode, 
 									IUsesViewerPivot
@@ -34,6 +35,7 @@ namespace ProBuilder2.VR
 		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
 		public Action<GameObject> addToSpatialHash { get; set; }
 		public Action<GameObject> removeFromSpatialHash { get; set; }
+	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 
 		enum ShapeCreationState
 		{
@@ -45,7 +47,9 @@ namespace ProBuilder2.VR
 		ShapeCreationState m_State = ShapeCreationState.StartPoint;
 		GameObject m_CurrentGameObject;
 		AShapeCreator m_CurrentShape;
+
 		Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
+		pb_Object m_HoveredObject = null;
 
 		void Start()
 		{
@@ -82,17 +86,40 @@ namespace ProBuilder2.VR
 			m_Shape = shape;
 		}
 
+		private pb_RaycastHit m_RaycastHit;
+
 		void HandleStartPoint(Standard standardInput, Action<InputControl> consumeControl)
 		{
 			if(m_PlaneVisual == null)
 				return;
 
-			Vector3 p;
+	   		GameObject first = getFirstGameObject(rayOrigin);
+	   		pb_Object pb = first != null ? first.GetComponent<pb_Object>() : null;
+	   		Vector3 rayCollisionPoint;
 
-			if( VRMath.GetPointOnPlane(rayOrigin, m_Plane, out p) )
+	   		if(pb != null && pb_HandleUtility.FaceRaycast(new Ray(rayOrigin.position, rayOrigin.forward), pb, out m_RaycastHit))
+	   		{
+	   			if(m_HoveredObject == null)
+		   			m_HoveredObject = pb;
+
+		   		rayCollisionPoint = pb.transform.TransformPoint(m_RaycastHit.point);
+		   		rayCollisionPoint = Snapping.Snap(rayCollisionPoint, Snapping.DEFAULT_INCREMENT, Vector3.one);
+		   		m_Plane.SetNormalAndPosition( pb.transform.TransformDirection(m_RaycastHit.normal).normalized, rayCollisionPoint );
+	   		}
+	   		else
+	   		{
+	   			if(m_HoveredObject != null)
+	   			{
+	   				m_HoveredObject = null;
+	   				m_Plane.SetNormalAndPosition(Vector3.up, Vector3.zero);
+	   			}
+	   		}
+
+			if( m_HoveredObject != null || VRMath.GetPointOnPlane(rayOrigin, m_Plane, out rayCollisionPoint) )
 			{
 				m_PlaneVisual.SetActive(true);
-				m_PlaneVisual.transform.position = Snapping.Snap(p, Snapping.DEFAULT_INCREMENT, Vector3.one);
+				m_PlaneVisual.transform.position = rayCollisionPoint;
+				m_PlaneVisual.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
 			}
 			else
 			{
@@ -107,7 +134,9 @@ namespace ProBuilder2.VR
 						m_CurrentShape = new CreateCube();
 						break;
 				}
-				
+
+				// If shape initialization failed no gameobject will have been created,
+				// so don't worry about cleaning up.
 				if( m_CurrentShape.HandleStart(rayOrigin, m_Plane) )
 				{
 					m_State = ShapeCreationState.EndPoint;

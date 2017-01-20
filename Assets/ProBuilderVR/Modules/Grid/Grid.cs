@@ -48,25 +48,29 @@ namespace ProBuilder2.VR
 			int n = 0;
 			for(int xx = 0; xx < lineCount; xx++)
 			{
+				// <--->
 				indices[n] = n;
 				uv[n] = new Vector2(xx / (float)(lineCount-1), 0f);
 				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3( xx * scale - half, 0f, -half );
+				lines[n++] = new Vector3( xx * scale - half,  -half, 0f);
 
 				indices[n] = n;
 				uv[n] = new Vector2(xx / (float)(lineCount-1), 1f);
 				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3( xx * scale - half, 0f,  half );
+				lines[n++] = new Vector3( xx * scale - half, half, 0f );
 
+				// ^
+				// |
+				// v
 				indices[n] = n;
 				uv[n] = new Vector2(0f, xx / (float)(lineCount-1));
 				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3( -half, 0f, xx * scale - half );
+				lines[n++] = new Vector3( -half, xx * scale - half, 0f );
 
 				indices[n] = n;
 				uv[n] = new Vector2(1f, xx / (float)(lineCount-1));
 				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3(  half, 0f, xx * scale - half );
+				lines[n++] = new Vector3(  half, xx * scale - half, 0f );
 			}
 
 			Mesh tm = new Mesh();
