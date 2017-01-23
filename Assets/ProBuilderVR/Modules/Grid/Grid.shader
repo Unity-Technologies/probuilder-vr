@@ -5,12 +5,14 @@
 		_Falloff ("Falloff", float) = .7
 		_Step("Step", float) = 1.
 	}
+	
 	SubShader
 	{
-		Tags { "RenderType"="Transparent" }
-		LOD 100
+		Tags { "Queue" = "Overlay+5000" "RenderType"="Transparent" "PerformanceChecks"="False" }
+		// Tags { "RenderType"="Transparent" }
 		ZTest LEqual
 		ZWrite On
+		Cull Off
 		Blend SrcAlpha OneMinusSrcAlpha
 
 		Pass

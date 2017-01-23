@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using ProBuilder2.Common;
 
 namespace ProBuilder2.VR
 {
@@ -10,6 +11,8 @@ namespace ProBuilder2.VR
 	public abstract class AShapeCreator
 	{
 		protected GameObject m_GameObject;
+
+		protected pb_Object m_Mesh;
 
 		protected static float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
 
@@ -40,6 +43,12 @@ namespace ProBuilder2.VR
 		public GameObject gameObject {
 			get {
 				return m_GameObject;
+			}
+		}
+
+		public pb_Object pbObject {
+			get {
+				return m_Mesh;
 			}
 		}
 	}

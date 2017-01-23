@@ -12,7 +12,6 @@ namespace ProBuilder2.VR
 		private Vector3[] positions = new Vector3[24];
 		private Vector3 m_StartPoint, m_EndPoint, m_BaseEndPoint, m_Size;
 		private Plane m_Plane;
-		private pb_Object m_Mesh = null;
 		private bool m_FacesReversed = false;
 		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
 

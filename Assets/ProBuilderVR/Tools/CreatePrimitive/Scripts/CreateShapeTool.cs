@@ -44,12 +44,12 @@ namespace ProBuilder2.VR
 		}
 
 		// shape creation vars
-		ShapeCreationState m_State = ShapeCreationState.StartPoint;
-		GameObject m_CurrentGameObject;
-		AShapeCreator m_CurrentShape;
-
-		Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
-		pb_Object m_HoveredObject = null;
+		private ShapeCreationState m_State = ShapeCreationState.StartPoint;
+		private GameObject m_CurrentGameObject;
+		private AShapeCreator m_CurrentShape;
+		private SelectionBoundsModule m_ShapeBounds;
+		private Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
+		private pb_Object m_HoveredObject = null;
 
 		void Start()
 		{
@@ -58,8 +58,17 @@ namespace ProBuilder2.VR
 			connectInterfaces(menu, rayOrigin);
 			menu.selectPrimitive = SetSelectedPrimitive;
 
+			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
+
 			m_PlaneVisual = U.Object.Instantiate(m_PlaneVisualPrefab);
 			m_PlaneVisual.SetActive(false);
+		}
+
+		void OnDestroy()
+		{
+			U.Object.Destroy(m_ShapeMenu);	
+			U.Object.Destroy(m_PlaneVisual);	
+			U.Object.Destroy(m_ShapeBounds.gameObject);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -153,19 +162,17 @@ namespace ProBuilder2.VR
 
 			m_CurrentShape.HandleDrag(rayOrigin);
 
+			m_ShapeBounds.SetHighlight(m_CurrentShape.pbObject, true);
+
 			if (standardInput.action.wasJustReleased)
 			{
 				if(!m_CurrentShape.HandleTriggerRelease(rayOrigin))
 					m_State = ShapeCreationState.StartPoint;
+
+				m_ShapeBounds.SetHighlight(m_CurrentShape.pbObject, false);
 			}
 			
 			consumeControl(standardInput.action);
-		}
-
-		void OnDestroy()
-		{
-			U.Object.Destroy(m_ShapeMenu);	
-			U.Object.Destroy(m_PlaneVisual);	
 		}
 	}
 }
