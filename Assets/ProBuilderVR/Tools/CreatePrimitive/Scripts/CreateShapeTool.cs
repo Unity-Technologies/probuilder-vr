@@ -118,7 +118,7 @@ namespace ProBuilder2.VR
 			if( m_HoveredObject != null || VRMath.GetPointOnPlane(rayOrigin, m_Plane, out rayCollisionPoint) )
 			{
 				m_PlaneVisual.SetActive(true);
-				m_PlaneVisual.transform.position = rayCollisionPoint;
+				m_PlaneVisual.transform.position = Snapping.Snap(rayCollisionPoint, Snapping.DEFAULT_INCREMENT, Vector3.one);
 				m_PlaneVisual.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
 			}
 			else

@@ -15,7 +15,6 @@ namespace ProBuilder2.VR
 		private pb_Object m_Mesh = null;
 		private bool m_FacesReversed = false;
 		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
-		private Quaternion m_Orientation = Quaternion.identity;
 
 		enum State
 		{
@@ -60,13 +59,23 @@ namespace ProBuilder2.VR
 			Vector3 endPoint;
 
 			if(state == State.Base)
+			{
 				VRMath.GetPointOnPlane(rayOrigin, m_Plane, out endPoint);
-			else
-				endPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
 
-			// Apply simple smoothing to ray input.
-			m_EndPoint = Vector3.Lerp(m_EndPoint, endPoint, .5f);
-			m_EndPoint = Snapping.Snap(m_EndPoint, m_SnapIncrement, VECTOR3_ONE);
+				// Apply simple smoothing to ray input.
+				m_EndPoint = Vector3.Lerp(m_EndPoint, endPoint, .5f);
+				m_EndPoint = Snapping.Snap(m_EndPoint, m_SnapIncrement, VECTOR3_ONE);
+			}
+			else
+			{
+				endPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
+				Vector3 dir = endPoint - m_BaseEndPoint;
+				dir.Normalize();
+				float m = Vector3.Dot(m_Plane.normal, dir) / 1f;
+				float distance = Vector3.Distance(endPoint, m_BaseEndPoint) * m;
+				distance = Snapping.Snap(distance, m_SnapIncrement);
+				m_EndPoint = m_BaseEndPoint + (m_Plane.normal * distance);
+			}
 
 			UpdateShape();
 		}
@@ -75,7 +84,6 @@ namespace ProBuilder2.VR
 		{
 			if(state == State.Base)
 			{
-				m_FacesReversed = false;
 				state = State.Height;
 				m_BaseEndPoint = m_EndPoint;
 				return true;
@@ -84,6 +92,7 @@ namespace ProBuilder2.VR
 			{
 				m_Mesh.CenterPivot(null);
 				state = State.Base;
+				m_FacesReversed = false;
 				return false;
 			}
 		}
@@ -106,31 +115,13 @@ namespace ProBuilder2.VR
 			Vector3 size = m_EndPoint - m_StartPoint;
 			m_Size = size;
 
-			// if(state == State.Base)
-			// {
-			// 	m_Size.x = size.x;
-			// 	m_Size.z = size.z;
+			bool isFlipped = !((m_Size.x < 0 ^ m_Size.y < 0) ^ m_Size.z < 0);
 
-			// 	bool isFlipped = !(m_Size.x < 0 ^ m_Size.z < 0);
-
-			// 	if(isFlipped != m_FacesReversed)
-			// 	{
-			// 		m_FacesReversed = isFlipped;
-			// 		m_Mesh.ReverseWindingOrder(m_Mesh.faces);
-			// 	}
-			// }
-			// else
-			// {
-			// 	m_Size.y = size.y;
-
-			// 	bool isFlipped = m_Size.y < 0;
-
-			// 	if(isFlipped != m_FacesReversed)
-			// 	{
-			// 		m_FacesReversed = isFlipped;
-			// 		m_Mesh.ReverseWindingOrder(m_Mesh.faces);
-			// 	}
-			// }
+			if(isFlipped != m_FacesReversed)
+			{
+				m_FacesReversed = isFlipped;
+				m_Mesh.ReverseWindingOrder(m_Mesh.faces);
+			}
 
 			template[0] = m_StartPoint;
 			template[1] = m_StartPoint + Vector3.Scale(new Vector3(1f, 0f, 0f), m_Size);
