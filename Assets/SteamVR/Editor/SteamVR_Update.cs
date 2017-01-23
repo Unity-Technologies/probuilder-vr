@@ -79,34 +79,36 @@ public class SteamVR_Update : EditorWindow
 
 	static bool ShouldDisplay()
 	{
-		if (string.IsNullOrEmpty(version))
-			return false;
-		if (version == currentVersion)
-			return false;
-		if (EditorPrefs.HasKey(string.Format(doNotShowKey, version)))
-			return false;
+		return false;
+		
+		// if (string.IsNullOrEmpty(version))
+		// 	return false;
+		// if (version == currentVersion)
+		// 	return false;
+		// if (EditorPrefs.HasKey(string.Format(doNotShowKey, version)))
+		// 	return false;
 
-		// parse to see if newer (e.g. 1.0.4 vs 1.0.3)
-		var versionSplit = version.Split('.');
-		var currentVersionSplit = currentVersion.Split('.');
-		for (int i = 0; i < versionSplit.Length && i < currentVersionSplit.Length; i++)
-		{
-			int versionValue, currentVersionValue;
-			if (int.TryParse(versionSplit[i], out versionValue) &&
-				int.TryParse(currentVersionSplit[i], out currentVersionValue))
-			{
-				if (versionValue > currentVersionValue)
-					return true;
-				if (versionValue < currentVersionValue)
-					return false;
-			}
-		}
+		// // parse to see if newer (e.g. 1.0.4 vs 1.0.3)
+		// var versionSplit = version.Split('.');
+		// var currentVersionSplit = currentVersion.Split('.');
+		// for (int i = 0; i < versionSplit.Length && i < currentVersionSplit.Length; i++)
+		// {
+		// 	int versionValue, currentVersionValue;
+		// 	if (int.TryParse(versionSplit[i], out versionValue) &&
+		// 		int.TryParse(currentVersionSplit[i], out currentVersionValue))
+		// 	{
+		// 		if (versionValue > currentVersionValue)
+		// 			return true;
+		// 		if (versionValue < currentVersionValue)
+		// 			return false;
+		// 	}
+		// }
 
-		// same up to this point, now differentiate based on number of sub values (e.g. 1.0.4.1 vs 1.0.4)
-		if (versionSplit.Length <= currentVersionSplit.Length)
-			return false;
+		// // same up to this point, now differentiate based on number of sub values (e.g. 1.0.4.1 vs 1.0.4)
+		// if (versionSplit.Length <= currentVersionSplit.Length)
+		// 	return false;
 
-		return true;
+		// return true;
 	}
 
 	Vector2 scrollPosition;

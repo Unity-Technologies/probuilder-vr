@@ -2818,14 +2818,14 @@ namespace UnityEditor.Experimental.EditorVR
 		private static EditorVR s_Instance;
 		private static InputManager s_InputManager;
 
-		[MenuItem("Window/EditorVR %e", false)]
+		[MenuItem("Window/EditorVR #%e", false)]
 		public static void ShowEditorVR()
 		{
 			// Using a utility window improves performance by saving from the overhead of DockArea.OnGUI()
 			VRView.GetWindow<VRView>(true, "EditorVR", true);
 		}
 
-		[MenuItem("Window/EditorVR %e", true)]
+		[MenuItem("Window/EditorVR #%e", true)]
 		public static bool ShouldShowEditorVR()
 		{
 			return PlayerSettings.virtualRealitySupported;
