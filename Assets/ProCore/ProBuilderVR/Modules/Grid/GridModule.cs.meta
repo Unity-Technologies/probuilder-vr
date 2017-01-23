@@ -1,10 +1,11 @@
 fileFormatVersion: 2
 guid: c556fbba4120c4d4d996784049110956
-timeCreated: 1484337509
+timeCreated: 1485199048
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_GridMaterial: {fileID: 2100000, guid: faa436616f2c74f4eaf16fc4ec6bbe37, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

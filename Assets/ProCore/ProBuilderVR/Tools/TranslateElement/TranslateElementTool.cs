@@ -21,7 +21,8 @@ namespace ProBuilder2.VR
 	[MainMenuItem("Move Elements", "ProBuilder", "Translate selected mesh elements.")]
 	public class TranslateElementTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults, ISetHighlight
 	{
-		[SerializeField] private AudioClip m_DragTick;
+		[SerializeField] private AudioClip m_Drag;
+		[SerializeField] private AudioClip m_Trigger;
 
 		enum CreateState
 		{
@@ -101,6 +102,8 @@ namespace ProBuilder2.VR
 				if(!input.action.wasJustPressed)
 					return;
 
+				m_AudioModule.Play(m_Trigger, true);
+
 				m_Object = pb;
 				m_Face = pb.faces[hit.face];
 				m_SelectedIndices = pb.sharedIndices.AllIndicesWithValues(m_Face.distinctIndices);
@@ -129,6 +132,7 @@ namespace ProBuilder2.VR
 			// Ready for next object to be created
 			if (input.action.wasJustReleased)
 			{
+				m_AudioModule.Play(m_Trigger, true);
 				m_Dragging = false;
 				m_State = CreateState.Start;
 				m_HighlightModule.SetFaceHighlight(m_Object, null);
@@ -159,7 +163,7 @@ namespace ProBuilder2.VR
 				if(vertexTranslation != m_PreviousVertexTranslation)
 				{
 					m_PreviousVertexTranslation = vertexTranslation;
-					m_AudioModule.Play(m_DragTick);
+					m_AudioModule.Play(m_Drag);
 				}
 
 				foreach(int ind in m_SelectedIndices)

@@ -34,6 +34,7 @@ namespace ProBuilder2.VR
 			m_StartPoint = m_EndPoint;
 
 			m_Mesh = pb_ShapeGenerator.CubeGenerator(VECTOR3_ONE);
+
 			m_Mesh.gameObject.GetComponent<MeshRenderer>().sharedMaterial = pb_Constant.DefaultMaterial;
 
 			foreach(pb_Face face in m_Mesh.faces)
@@ -90,6 +91,7 @@ namespace ProBuilder2.VR
 			else
 			{
 				m_Mesh.CenterPivot(new int[] { 0 });
+				m_Mesh.gameObject.GetComponent<MeshRenderer>().sharedMaterial = pb_Constant.DefaultMaterial;
 				state = State.Base;
 				m_FacesReversed = false;
 				return false;

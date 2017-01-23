@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Experimental.EditorVR.Utilities;
 using System.Collections;
 
 namespace ProBuilder2.VR
@@ -6,27 +7,38 @@ namespace ProBuilder2.VR
 	/**
  	 * Renders a line grid.
 	 */
-	[RequireComponent(typeof(MeshFilter))]
-	[RequireComponent(typeof(MeshRenderer))]
-	public class Grid : MonoBehaviour
+	public class GridModule : MonoBehaviour
 	{
-		public int lines = 32;
+		[SerializeField] private Material m_GridMaterial;
+
+		private Mesh m_Mesh;
+
+		private int lines = 32;
 		private float scale = Snapping.DEFAULT_INCREMENT;
-		public Color32 gridColor = new Color32(99, 99, 99, 128);
-		public Color32 centerColor = new Color32(99, 99, 99, 210);
+		private Color32 gridColor = new Color32(99, 99, 99, 128);
+		private Color32 centerColor = new Color32(0, 210, 255, 235);
+		private bool m_isVisible = true;
 
 		void Start()
 		{
-			GetComponent<MeshFilter>().sharedMesh = GridMesh(lines, scale);
+			m_Mesh = GridMesh(lines, scale);
 			transform.position = Vector3.zero;
 		}
 
 		void OnDestroy()
 		{
-			Mesh m = GetComponent<MeshFilter>().sharedMesh;
+			U.Object.Destroy(m_Mesh);
+		}
 
-			if(m != null)
-				Object.DestroyImmediate(m);
+		void LateUpdate()
+		{
+			if(m_isVisible)
+				Graphics.DrawMesh(m_Mesh, transform.localToWorldMatrix, m_GridMaterial, gameObject.layer, null, 0);
+		}
+
+		public void SetVisible(bool isVisible)
+		{
+			m_isVisible = isVisible;
 		}
 
 		/**

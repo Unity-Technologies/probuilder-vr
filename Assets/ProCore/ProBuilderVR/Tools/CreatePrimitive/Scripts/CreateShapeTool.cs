@@ -21,17 +21,15 @@ namespace ProBuilder2.VR
 									IExclusiveMode, 
 									IUsesViewerPivot
 	{
-		[SerializeField]
-		CreateShapeMenu m_ShapeMenuPrefab;
-		GameObject m_ShapeMenu;
 
-		[SerializeField] private AudioClip m_NewShapeAudio;
+		[SerializeField] private AudioClip m_TriggerReleased;
 		[SerializeField] private AudioClip m_DragAudio;
+		[SerializeField] private Material m_HighlightMaterial;
+
+		[SerializeField] private CreateShapeMenu m_ShapeMenuPrefab;
+		private GameObject m_ShapeMenu;
 
 		Shape m_Shape = Shape.Cube;
-
-		[SerializeField] GameObject m_PlaneVisualPrefab;
-		GameObject m_PlaneVisual;
 
 		public Func<Transform, IMenu, GameObject> instantiateMenuUI { private get; set; }
 		public Transform rayOrigin { get; set; }
@@ -53,6 +51,7 @@ namespace ProBuilder2.VR
 		private AShapeCreator m_CurrentShape;
 		private SelectionBoundsModule m_ShapeBounds;
 		private VRAudioModule m_AudioModule;
+		private GridModule m_GridModule;
 		private Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
 		private pb_Object m_HoveredObject = null;
 
@@ -65,17 +64,17 @@ namespace ProBuilder2.VR
 
 			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
+			m_GridModule = U.Object.CreateGameObjectWithComponent<GridModule>();
 
-			m_PlaneVisual = U.Object.Instantiate(m_PlaneVisualPrefab);
-			m_PlaneVisual.SetActive(false);
+			m_GridModule.SetVisible(false);
 		}
 
 		void OnDestroy()
 		{
 			U.Object.Destroy(m_ShapeMenu);	
-			U.Object.Destroy(m_PlaneVisual);	
 			U.Object.Destroy(m_AudioModule.gameObject);
 			U.Object.Destroy(m_ShapeBounds.gameObject);
+			U.Object.Destroy(m_GridModule.gameObject);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -106,7 +105,8 @@ namespace ProBuilder2.VR
 
 		void HandleStartPoint(Standard standardInput, Action<InputControl> consumeControl)
 		{
-			if(m_PlaneVisual == null)
+			// HandleStartPoint can be called before Start()?
+			if(m_GridModule == null)
 				return;
 
 	   		GameObject first = getFirstGameObject(rayOrigin);
@@ -133,13 +133,13 @@ namespace ProBuilder2.VR
 
 			if( m_HoveredObject != null || VRMath.GetPointOnPlane(rayOrigin, m_Plane, out rayCollisionPoint) )
 			{
-				m_PlaneVisual.SetActive(true);
-				m_PlaneVisual.transform.position = Snapping.Snap(rayCollisionPoint, Snapping.DEFAULT_INCREMENT, Vector3.one);
-				m_PlaneVisual.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
+				m_GridModule.SetVisible(true);
+				m_GridModule.transform.position = Snapping.Snap(rayCollisionPoint, Snapping.DEFAULT_INCREMENT, Vector3.one);
+				m_GridModule.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
 			}
 			else
 			{
-				m_PlaneVisual.SetActive(false);
+				m_GridModule.SetVisible(false);
 			}
 
 			if (standardInput.action.wasJustPressed)
@@ -155,8 +155,9 @@ namespace ProBuilder2.VR
 				// so don't worry about cleaning up.
 				if( m_CurrentShape.HandleStart(rayOrigin, m_Plane) )
 				{
-					m_AudioModule.Play(m_NewShapeAudio);
+					m_AudioModule.Play(m_TriggerReleased, true);
 					m_CurrentShape.onShapeChanged = () => { m_AudioModule.Play(m_DragAudio); };
+					m_CurrentShape.gameObject.GetComponent<MeshRenderer>().sharedMaterial = m_HighlightMaterial;
 					m_State = ShapeCreationState.EndPoint;
 					addToSpatialHash(m_CurrentShape.gameObject);
 					consumeControl(standardInput.action);
@@ -175,6 +176,8 @@ namespace ProBuilder2.VR
 
 			if (standardInput.action.wasJustReleased)
 			{
+				m_AudioModule.Play(m_TriggerReleased, true);
+
 				if(!m_CurrentShape.HandleTriggerRelease(rayOrigin))
 					m_State = ShapeCreationState.StartPoint;
 

@@ -1,15 +1,15 @@
 fileFormatVersion: 2
 guid: 70b47b7ac7f46e04b98822c5614ae421
-timeCreated: 1485197745
+timeCreated: 1485199861
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
-  - m_ShapeMenuPrefab: {fileID: 114000012271056484, guid: 48dc170f610071a40b20905b1f88994c,
-      type: 2}
-  - m_NewShapeAudio: {fileID: 8300000, guid: 46f59cd4c4ee3244da87d1320a7f7cc3, type: 3}
+  - m_TriggerReleased: {fileID: 8300000, guid: 1cdfb31a0dadec349b2d2c2eb83299a6, type: 3}
   - m_DragAudio: {fileID: 8300000, guid: c3100be47b63aae4d8500221e72a80c3, type: 3}
-  - m_PlaneVisualPrefab: {fileID: 1000013369477532, guid: a98d96423df261b40b993ed8ecc91717,
+  - m_HighlightMaterial: {fileID: 2100000, guid: 331e7f34b37199d4faa61fb6643e35df,
+      type: 2}
+  - m_ShapeMenuPrefab: {fileID: 114000012271056484, guid: 48dc170f610071a40b20905b1f88994c,
       type: 2}
   executionOrder: 0
   icon: {instanceID: 0}

@@ -9,6 +9,7 @@ namespace ProBuilder2.VR
 	public class VRAudioModule : MonoBehaviour
 	{
 		[SerializeField] private AudioSource m_AudioSource = null;
+		private bool m_DontOverrideCurrent = false;
 
 		void Start()
 		{
@@ -16,8 +17,13 @@ namespace ProBuilder2.VR
 				m_AudioSource = gameObject.AddComponent<AudioSource>();
 		}
 
-		public void Play(AudioClip clip)
+		public void Play(AudioClip clip, bool ensureCompletion = false)
 		{
+			if(m_DontOverrideCurrent && m_AudioSource.isPlaying)
+				return;
+
+			m_DontOverrideCurrent = ensureCompletion;
+
 			m_AudioSource.clip = clip;
 			m_AudioSource.Play();
 		}
