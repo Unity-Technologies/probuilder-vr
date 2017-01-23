@@ -21,42 +21,48 @@ namespace ProBuilder2.VR
 	[MainMenuItem("Move Elements", "ProBuilder", "Translate selected mesh elements.")]
 	public class TranslateElementTool : MonoBehaviour, ITool, IStandardActionMap, IUsesRayOrigin, IUsesRaycastResults, ISetHighlight
 	{
+		[SerializeField] private AudioClip m_DragTick;
+
+		enum CreateState
+		{
+			Start,
+			Finish
+		}
+
 		public Transform rayOrigin { get; set; }
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 		public Action<GameObject, bool> setHighlight { get; set; }
 
 		private HighlightElementsModule m_HighlightModule = null;
+		private VRAudioModule m_AudioModule = null;
 		const float MAX_TRANSLATE_DISTANCE = 100f;
 		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
 		private float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
+
+	   	private CreateState m_State = CreateState.Start;
+	   	private bool m_Dragging = false;
+	   	private Vector3 m_DragOrigin = Vector3.zero;
+		private Vector3 m_DragDirection = Vector3.zero;
+		private Vector3 m_DraggedPoint = Vector3.zero;
 		private Vector3 m_PreviousLinePosition = Vector3.zero;
-
-	   	enum CreateState
-	   	{
-	   		Start,
-	   		Finish
-	   	}
-
-	   	CreateState m_State = CreateState.Start;
-	   	bool m_Dragging = false;
-	   	Vector3 m_DragOrigin = Vector3.zero;
-		Vector3 m_DragDirection = Vector3.zero;
-		Vector3 m_DraggedPoint = Vector3.zero;
-
-		pb_Object m_Object;
-		pb_Face m_Face;
-		IEnumerable<int> m_SelectedIndices;
-		Vector3[] m_Positions;
-		Vector3[] m_SettingPositions;
+		private Vector3 m_PreviousVertexTranslation = Vector3.zero;
+		
+		private pb_Object m_Object;
+		private pb_Face m_Face;
+		private IEnumerable<int> m_SelectedIndices;
+		private Vector3[] m_Positions;
+		private Vector3[] m_SettingPositions;
 
 		void Start()
 		{
 			m_HighlightModule = U.Object.CreateGameObjectWithComponent<HighlightElementsModule>();
+			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 		}
 
 		void OnDestroy()
 		{
 			U.Object.Destroy(m_HighlightModule.gameObject);
+			U.Object.Destroy(m_AudioModule.gameObject);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -142,16 +148,22 @@ namespace ProBuilder2.VR
 				Vector3 smoothedDragPoint = Vector3.Lerp(m_PreviousLinePosition, m_DraggedPoint, .5f);
 				Vector3 localDragOrigin = m_Object.transform.InverseTransformPoint(m_DragOrigin);
 				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(smoothedDragPoint);
-				Vector3 dir = localDraggedPoint - localDragOrigin;
+				Vector3 vertexTranslation = localDraggedPoint - localDragOrigin;
 				m_PreviousLinePosition = m_DraggedPoint;
 
-				if(dir.magnitude > MAX_TRANSLATE_DISTANCE)
-					dir = dir.normalized * MAX_TRANSLATE_DISTANCE;
+				if(vertexTranslation.magnitude > MAX_TRANSLATE_DISTANCE)
+					vertexTranslation = vertexTranslation.normalized * MAX_TRANSLATE_DISTANCE;
 
-				dir = Snapping.Snap(dir, m_SnapIncrement, VECTOR3_ONE);
+				vertexTranslation = Snapping.Snap(vertexTranslation, m_SnapIncrement, VECTOR3_ONE);
+
+				if(vertexTranslation != m_PreviousVertexTranslation)
+				{
+					m_PreviousVertexTranslation = vertexTranslation;
+					m_AudioModule.Play(m_DragTick);
+				}
 
 				foreach(int ind in m_SelectedIndices)
-					m_SettingPositions[ind] = m_Positions[ind] + dir;
+					m_SettingPositions[ind] = m_Positions[ind] + vertexTranslation;
 
 				m_Object.SetVertices(m_SettingPositions);
 				m_Object.msh.vertices = m_SettingPositions;

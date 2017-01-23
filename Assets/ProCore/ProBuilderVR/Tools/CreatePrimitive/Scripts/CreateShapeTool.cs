@@ -24,6 +24,10 @@ namespace ProBuilder2.VR
 		[SerializeField]
 		CreateShapeMenu m_ShapeMenuPrefab;
 		GameObject m_ShapeMenu;
+
+		[SerializeField] private AudioClip m_NewShapeAudio;
+		[SerializeField] private AudioClip m_DragAudio;
+
 		Shape m_Shape = Shape.Cube;
 
 		[SerializeField] GameObject m_PlaneVisualPrefab;
@@ -48,6 +52,7 @@ namespace ProBuilder2.VR
 		private GameObject m_CurrentGameObject;
 		private AShapeCreator m_CurrentShape;
 		private SelectionBoundsModule m_ShapeBounds;
+		private VRAudioModule m_AudioModule;
 		private Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
 		private pb_Object m_HoveredObject = null;
 
@@ -59,6 +64,7 @@ namespace ProBuilder2.VR
 			menu.selectPrimitive = SetSelectedPrimitive;
 
 			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
+			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 
 			m_PlaneVisual = U.Object.Instantiate(m_PlaneVisualPrefab);
 			m_PlaneVisual.SetActive(false);
@@ -68,6 +74,7 @@ namespace ProBuilder2.VR
 		{
 			U.Object.Destroy(m_ShapeMenu);	
 			U.Object.Destroy(m_PlaneVisual);	
+			U.Object.Destroy(m_AudioModule.gameObject);
 			U.Object.Destroy(m_ShapeBounds.gameObject);
 		}
 
@@ -148,6 +155,8 @@ namespace ProBuilder2.VR
 				// so don't worry about cleaning up.
 				if( m_CurrentShape.HandleStart(rayOrigin, m_Plane) )
 				{
+					m_AudioModule.Play(m_NewShapeAudio);
+					m_CurrentShape.onShapeChanged = () => { m_AudioModule.Play(m_DragAudio); };
 					m_State = ShapeCreationState.EndPoint;
 					addToSpatialHash(m_CurrentShape.gameObject);
 					consumeControl(standardInput.action);

@@ -1,11 +1,10 @@
 fileFormatVersion: 2
-guid: bb2ed9d635f9f6c458f04c4ac4cfe1a3
-timeCreated: 1485196176
+guid: 343e33bc9f46b2b46b03e575fe1db9b5
+timeCreated: 1485196135
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
-  defaultReferences:
-  - m_DragTick: {fileID: 8300000, guid: 247bd0be1ed21fa4282f342f54025763, type: 3}
+  defaultReferences: []
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

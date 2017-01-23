@@ -1,0 +1,9 @@
+# Audio Clip Attribution
+
+- Tick.mp3
+	- Creator: Deep Frozen Apps
+	- URL: http://soundbible.com/2044-Tick.html
+
+- Button.mp3
+	- Creator: Mike Koenig
+	- URL: http://soundbible.com/772-Button.html

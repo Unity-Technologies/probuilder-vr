@@ -34,6 +34,7 @@ namespace ProBuilder2.VR
 			m_StartPoint = m_EndPoint;
 
 			m_Mesh = pb_ShapeGenerator.CubeGenerator(VECTOR3_ONE);
+			m_Mesh.gameObject.GetComponent<MeshRenderer>().sharedMaterial = pb_Constant.DefaultMaterial;
 
 			foreach(pb_Face face in m_Mesh.faces)
 				face.uv.useWorldSpace = true;
@@ -111,7 +112,18 @@ namespace ProBuilder2.VR
 			 */
 
 			Vector3 size = m_EndPoint - m_StartPoint;
-			m_Size = size;
+
+			if(m_Size != size)
+			{
+				if(onShapeChanged != null)
+					onShapeChanged();
+
+				m_Size = size;
+			}
+			else
+			{
+				return;
+			}
 
 			bool isFlipped = !((m_Size.x < 0 ^ m_Size.y < 0) ^ m_Size.z < 0);
 
