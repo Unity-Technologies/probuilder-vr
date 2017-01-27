@@ -9,35 +9,35 @@ PluginImporter:
   isPreloaded: 0
   platformData:
     Any:
-      enabled: 0
+      enabled: 1
       settings: {}
     Editor:
-      enabled: 1
+      enabled: 0
       settings:
         DefaultValueInitialized: true
     Linux:
-      enabled: 1
+      enabled: 0
       settings: {}
     Linux64:
-      enabled: 1
+      enabled: 0
       settings: {}
     LinuxUniversal:
-      enabled: 1
+      enabled: 0
       settings: {}
     OSXIntel:
-      enabled: 1
+      enabled: 0
       settings: {}
     OSXIntel64:
-      enabled: 1
+      enabled: 0
       settings: {}
     OSXUniversal:
-      enabled: 1
+      enabled: 0
       settings: {}
     Win:
-      enabled: 1
+      enabled: 0
       settings: {}
     Win64:
-      enabled: 1
+      enabled: 0
       settings: {}
     WindowsStoreApps:
       enabled: 0
