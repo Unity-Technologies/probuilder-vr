@@ -4,7 +4,7 @@ using System.Collections;
 namespace ProBuilder2.VR
 {
 	/**
-	 * Singleton for playing audio clips in VR editor.
+	 * Play audio clips in VR editor.
 	 */
 	public class VRAudioModule : MonoBehaviour
 	{

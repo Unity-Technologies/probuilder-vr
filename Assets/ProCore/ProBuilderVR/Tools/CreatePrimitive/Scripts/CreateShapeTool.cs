@@ -42,17 +42,20 @@ namespace ProBuilder2.VR
 		private ShapeCreationState m_State = ShapeCreationState.StartPoint;
 		private GameObject m_CurrentGameObject;
 		private AShapeCreator m_CurrentShape;
+		private Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
+		private pb_Object m_HoveredObject = null;
+
 		private SelectionBoundsModule m_ShapeBounds;
 		private VRAudioModule m_AudioModule;
 		private GridModule m_GridModule;
-		private Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
-		private pb_Object m_HoveredObject = null;
+		private GuideModule m_GuideModule;
 
 		void Start()
 		{
 			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 			m_GridModule = U.Object.CreateGameObjectWithComponent<GridModule>();
+			m_GuideModule = U.Object.CreateGameObjectWithComponent<GuideModule>();
 
 			m_GridModule.SetVisible(false);
 		}
@@ -62,6 +65,7 @@ namespace ProBuilder2.VR
 			U.Object.Destroy(m_AudioModule.gameObject);
 			U.Object.Destroy(m_ShapeBounds.gameObject);
 			U.Object.Destroy(m_GridModule.gameObject);
+			U.Object.Destroy(m_GuideModule.gameObject);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -123,6 +127,9 @@ namespace ProBuilder2.VR
 				m_GridModule.SetVisible(true);
 				m_GridModule.transform.position = Snapping.Snap(rayCollisionPoint, Snapping.DEFAULT_INCREMENT, Vector3.one);
 				m_GridModule.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
+
+				m_GuideModule.transform.position = m_GridModule.transform.position;
+				m_GuideModule.transform.localRotation = m_GridModule.transform.localRotation;
 			}
 			else
 			{
@@ -143,7 +150,11 @@ namespace ProBuilder2.VR
 				if( m_CurrentShape.HandleStart(rayOrigin, m_Plane) )
 				{
 					m_AudioModule.Play(m_TriggerReleased, true);
-					m_CurrentShape.onShapeChanged = () => { m_AudioModule.Play(m_DragAudio); };
+					m_CurrentShape.onShapeChanged = (v) =>
+					{
+						m_GuideModule.transform.position = v;
+						m_AudioModule.Play(m_DragAudio); 
+					};
 					m_CurrentShape.gameObject.GetComponent<MeshRenderer>().sharedMaterial = m_HighlightMaterial;
 					m_State = ShapeCreationState.EndPoint;
 					addToSpatialHash(m_CurrentShape.gameObject);

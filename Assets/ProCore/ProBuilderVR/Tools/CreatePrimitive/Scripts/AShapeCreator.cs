@@ -24,7 +24,7 @@ namespace ProBuilder2.VR
 		/**
 		 * Delegate to be called when the drawn shape is modified.
 		 */
-		public System.Action onShapeChanged;
+		public System.Action<Vector3> onShapeChanged;
 
 		/**
 		 * Begin drawing a shape.  If HandleStart returns false no GameObject has been created

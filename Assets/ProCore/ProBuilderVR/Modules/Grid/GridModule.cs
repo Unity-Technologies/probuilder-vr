@@ -13,16 +13,17 @@ namespace ProBuilder2.VR
 
 		private Mesh m_Mesh;
 
-		private int lines = 32;
-		private float scale = Snapping.DEFAULT_INCREMENT;
-		private Color32 gridColor = new Color32(99, 99, 99, 128);
-		private Color32 centerColor = new Color32(0, 210, 255, 235);
+		private int m_LineCount = 32;
+		private bool m_HasUpGuide = false;	// what's upguide? ... not much, you?
+		private float m_Scale = Snapping.DEFAULT_INCREMENT;
+		private Color32 m_GridColor = new Color32(99, 99, 99, 128);
+		private Color32 m_CenterColor = new Color32(0, 210, 255, 235);
 		private bool m_isVisible = true;
 
 		void Start()
 		{
 			m_Mesh = new Mesh();
-			RebuildGridMesh(m_Mesh, lines, scale, gridColor, centerColor);
+			RebuildGridMesh();
 			transform.position = Vector3.zero;
 		}
 
@@ -39,8 +40,8 @@ namespace ProBuilder2.VR
 
 		public void SetScale(float newScale)
 		{
-			scale = newScale;
-			RebuildGridMesh(m_Mesh, lines, scale, gridColor, centerColor);
+			m_Scale = newScale;
+			RebuildGridMesh();
 		}		
 
 		public void SetVisible(bool isVisible)
@@ -51,18 +52,18 @@ namespace ProBuilder2.VR
 		/**
 		 * Builds a grid object in 2d space
 		 */
-		static void RebuildGridMesh(Mesh m, int lineCount, float scale, Color32 gridColor, Color32 centerColor)
+		void RebuildGridMesh()
 		{
-			float half = (lineCount/2f) * scale;
+			float half = (m_LineCount/2f) * m_Scale;
 
 			// to make grid lines equal and such
-			lineCount++;
+			int lineCount = m_LineCount + 1;
 
 			// 2 vertices per line, 2 * lines per grid, + 2 for Y
-			Vector3[] lines = new Vector3[lineCount * 4 + 2];
-			Vector2[] uv = new Vector2[lineCount * 4 + 2];
-			Color32[] color = new Color32[lineCount * 4 + 2];
-			int[] indices = new int[lineCount * 4 + 2];
+			Vector3[] lines = new Vector3[lineCount * 4 + (m_HasUpGuide ? 2 : 0)];
+			Vector2[] uv = new Vector2[lineCount * 4 + (m_HasUpGuide ? 2 : 0)];
+			Color32[] color = new Color32[lineCount * 4 + (m_HasUpGuide ? 2 : 0)];
+			int[] indices = new int[lineCount * 4 + (m_HasUpGuide ? 2 : 0)];
 
 			int n = 0;
 			for(int xx = 0; xx < lineCount; xx++)
@@ -70,47 +71,50 @@ namespace ProBuilder2.VR
 				// <--->
 				indices[n] = n;
 				uv[n] = new Vector2(xx / (float)(lineCount-1), 0f);
-				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3( xx * scale - half,  -half, 0f);
+				color[n] = (xx == lineCount / 2) ? m_CenterColor : m_GridColor;
+				lines[n++] = new Vector3( xx * m_Scale - half,  -half, 0f);
 
 				indices[n] = n;
 				uv[n] = new Vector2(xx / (float)(lineCount-1), 1f);
-				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3( xx * scale - half, half, 0f );
+				color[n] = (xx == lineCount / 2) ? m_CenterColor : m_GridColor;
+				lines[n++] = new Vector3( xx * m_Scale - half, half, 0f );
 
 				// ^
 				// |
 				// v
 				indices[n] = n;
 				uv[n] = new Vector2(0f, xx / (float)(lineCount-1));
-				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3( -half, xx * scale - half, 0f );
+				color[n] = (xx == lineCount / 2) ? m_CenterColor : m_GridColor;
+				lines[n++] = new Vector3( -half, xx * m_Scale - half, 0f );
 
 				indices[n] = n;
 				uv[n] = new Vector2(1f, xx / (float)(lineCount-1));
-				color[n] = (xx == lineCount / 2) ? centerColor : gridColor;
-				lines[n++] = new Vector3(  half, xx * scale - half, 0f );
+				color[n] = (xx == lineCount / 2) ? m_CenterColor : m_GridColor;
+				lines[n++] = new Vector3(  half, xx * m_Scale - half, 0f );
 			}
 
-			indices[n] = n;
-			uv[n] = new Vector2(.5f, .5f);
-			color[n] = centerColor;
-			lines[n] = new Vector3(0f, 0f, 100f);
+			if(m_HasUpGuide)
+			{
+				indices[n] = n;
+				uv[n] = new Vector2(.5f, .5f);
+				color[n] = m_CenterColor;
+				lines[n] = new Vector3(0f, 0f, 100f);
 
-			n++;
+				n++;
 
-			indices[n] = n;
-			uv[n] = new Vector2(.5f, .5f);
-			color[n] = centerColor;
-			lines[n] = new Vector3(0f, 0f, -100f);
+				indices[n] = n;
+				uv[n] = new Vector2(.5f, .5f);
+				color[n] = m_CenterColor;
+				lines[n] = new Vector3(0f, 0f, -100f);
+			}
 
-			m.Clear();
-			m.name = "GridMesh";
-			m.vertices = lines;
-			m.colors32 = color;
-			m.subMeshCount = 1;
-			m.SetIndices(indices, MeshTopology.Lines, 0);
-			m.uv = uv;
+			m_Mesh.Clear();
+			m_Mesh.name = "GridMesh";
+			m_Mesh.vertices = lines;
+			m_Mesh.colors32 = color;
+			m_Mesh.subMeshCount = 1;
+			m_Mesh.SetIndices(indices, MeshTopology.Lines, 0);
+			m_Mesh.uv = uv;
 		}
 	}
 }

@@ -117,10 +117,10 @@ namespace ProBuilder2.VR
 
 			if(m_Size != size)
 			{
-				if(onShapeChanged != null)
-					onShapeChanged();
-
 				m_Size = size;
+				
+				if(onShapeChanged != null)
+					onShapeChanged(m_StartPoint + m_Size);
 			}
 			else
 			{
