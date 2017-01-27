@@ -6,8 +6,8 @@ Material:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: Controller_Glow
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Name: PBGunMat_VertColored
+  m_Shader: {fileID: 4800000, guid: 3a6e79a67e3129f409bae52acc3ab06b, type: 3}
   m_ShaderKeywords: _EMISSION
   m_LightmapFlags: 1
   m_CustomRenderQueue: -1
@@ -83,6 +83,9 @@ Material:
         name: _DstBlend
       second: 0
     - first:
+        name: _Gloss
+      second: 0.8
+    - first:
         name: _GlossMapScale
       second: 1
     - first:
@@ -121,7 +124,7 @@ Material:
     m_Colors:
     - first:
         name: _Color
-      second: {r: 0.19117641, g: 0.832657, b: 1, a: 1}
+      second: {r: 1, g: 1, b: 1, a: 1}
     - first:
         name: _EmissionColor
-      second: {r: 0.57647055, g: 2.4941177, b: 3, a: 1}
+      second: {r: 0, g: 0, b: 0, a: 1}

@@ -1,13 +1,13 @@
 fileFormatVersion: 2
 guid: 1dd05fa08947fc34392a98bded9b0ae0
-timeCreated: 1467068989
+timeCreated: 1485486905
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
-  - m_LeftHandProxyPrefab: {fileID: 1000010426338840, guid: fbcfdb50f5e2d7a45bebae9a3a90b3fa,
+  - m_LeftHandProxyPrefab: {fileID: 1000011438707234, guid: 2ced78e9e38e3ad42a29adbbecfb195d,
       type: 2}
-  - m_RightHandProxyPrefab: {fileID: 1000010426338840, guid: fbcfdb50f5e2d7a45bebae9a3a90b3fa,
+  - m_RightHandProxyPrefab: {fileID: 1000011438707234, guid: 2ced78e9e38e3ad42a29adbbecfb195d,
       type: 2}
   - m_PlayerInput: {instanceID: 0}
   executionOrder: 0
