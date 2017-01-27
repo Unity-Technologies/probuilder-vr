@@ -13,8 +13,6 @@ namespace ProBuilder2.VR
 	public class CreateShapeTool : 	MonoBehaviour,
 									ITool, 
 									IStandardActionMap,
-									IConnectInterfaces,
-									IInstantiateMenuUI,
 									IUsesRayOrigin,
 									IUsesRaycastResults,
 									IUsesSpatialHash,
@@ -26,15 +24,10 @@ namespace ProBuilder2.VR
 		[SerializeField] private AudioClip m_DragAudio;
 		[SerializeField] private Material m_HighlightMaterial;
 
-		[SerializeField] private CreateShapeMenu m_ShapeMenuPrefab;
-		private GameObject m_ShapeMenu;
-
 		Shape m_Shape = Shape.Cube;
 
-		public Func<Transform, IMenu, GameObject> instantiateMenuUI { private get; set; }
 		public Transform rayOrigin { get; set; }
 		public Transform viewerPivot { get; set; }
-		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
 		public Action<GameObject> addToSpatialHash { get; set; }
 		public Action<GameObject> removeFromSpatialHash { get; set; }
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
@@ -57,11 +50,6 @@ namespace ProBuilder2.VR
 
 		void Start()
 		{
-			m_ShapeMenu = instantiateMenuUI(rayOrigin, m_ShapeMenuPrefab);
-			var menu = m_ShapeMenu.GetComponent<CreateShapeMenu>();
-			connectInterfaces(menu, rayOrigin);
-			menu.selectPrimitive = SetSelectedPrimitive;
-
 			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 			m_GridModule = U.Object.CreateGameObjectWithComponent<GridModule>();
@@ -71,7 +59,6 @@ namespace ProBuilder2.VR
 
 		void OnDestroy()
 		{
-			U.Object.Destroy(m_ShapeMenu);	
 			U.Object.Destroy(m_AudioModule.gameObject);
 			U.Object.Destroy(m_ShapeBounds.gameObject);
 			U.Object.Destroy(m_GridModule.gameObject);
