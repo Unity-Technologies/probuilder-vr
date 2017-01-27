@@ -83,18 +83,26 @@ namespace ProBuilder2.VR
 			GameObject first = getFirstGameObject(rayOrigin);
 
 			if(first == null)	
+			{
+				if(m_HighlightModule != null)
+					m_HighlightModule.Clear();
+
 				return;
+			}
 
 			pb_Object pb = first.GetComponent<pb_Object>();
 			
 			if(pb == null)	
+			{
+				m_HighlightModule.Clear();
 				return;
+			}
 
 			pb_RaycastHit hit;
 
 			if( pb_HandleUtility.FaceRaycast(new Ray(rayOrigin.position, rayOrigin.forward), pb, out hit) )
 			{
-				m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] } );
+				m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] }, true);
 				setHighlight(pb.gameObject, false);
 
 				consumeControl(input.action);

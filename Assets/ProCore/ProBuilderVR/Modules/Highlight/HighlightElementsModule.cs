@@ -29,16 +29,23 @@ namespace ProBuilder2.VR
 
 		void OnDestroy()
 		{
+			Clear();
+		}
+
+		public void Clear()
+		{
 			List<Mesh> m = m_Highlights.Values.ToList();
+
 			for(int i = m.Count - 1; i > -1; i--)
 				U.Object.Destroy(m[i]);
+
 			m_Highlights.Clear();
 		}
 
 		/**
 		 * Highlight a set of faces on a pb_Object.
 		 */
-		public void SetFaceHighlight(pb_Object pb, pb_Face[] faces)
+		public void SetFaceHighlight(pb_Object pb, pb_Face[] faces, bool exclusive = false)
 		{
 			if(pb == null)
 				return;
@@ -47,6 +54,9 @@ namespace ProBuilder2.VR
 
 			if(!m_Highlights.TryGetValue(pb, out m))
 			{
+				if(exclusive)
+					Clear();
+
 				if(faces != null)
 				{
 					if(m == null)
@@ -61,12 +71,36 @@ namespace ProBuilder2.VR
 					return;
 				}
 			}
-			else if(faces == null)
+			else 
 			{
-				Mesh t = m;
-				m_Highlights.Remove(pb);
-				U.Object.Destroy(t);
-				return;
+				if(faces == null)
+				{
+					if(exclusive)
+					{
+						Clear();
+					}
+					else
+					{	
+						Mesh t = m;
+						m_Highlights.Remove(pb);
+						U.Object.Destroy(t);
+					}
+					return;
+				}
+				else
+				{
+					if(exclusive)
+					{
+						IEnumerable<pb_Object> rm = m_Highlights.Keys.Where(x => x != pb);
+
+						foreach(pb_Object p in rm)
+						{
+							Mesh t = m_Highlights[p];
+							m_Highlights.Remove(p);
+							U.Object.Destroy(t);
+						}
+					}
+				}
 			}
 
 			m.triangles = pb_Face.AllTriangles(faces);
