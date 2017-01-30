@@ -19,16 +19,11 @@ namespace ProBuilder2.VR
 	 * Translates faces along their normal.
 	 */
 	[MainMenuItem("Move Elements", "ProBuilder", "Translate selected mesh elements.")]
-	public class TranslateElementTool : MonoBehaviour,
+	public class TranslateElementTool : ProBuilderToolBase,
 										ITool,
 										IStandardActionMap,
-										IUsesRayOrigin,
 										IUsesRaycastResults,
-										ISetHighlight,
-										IConnectInterfaces,
-										IInstantiateUI,
-										ISelectTool,
-										IUsesMenuOrigins
+										ISetHighlight
 	{
 		[SerializeField] private AudioClip m_Drag;
 		[SerializeField] private AudioClip m_Trigger;
@@ -39,7 +34,6 @@ namespace ProBuilder2.VR
 			Finish
 		}
 
-		public Transform rayOrigin { get; set; }
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 		public Action<GameObject, bool> setHighlight { get; set; }
 
@@ -63,40 +57,16 @@ namespace ProBuilder2.VR
 		private Vector3[] m_Positions;
 		private Vector3[] m_SettingPositions;
 
-
-
-		///// <<<<
-		[SerializeField] private ProBuilderToolMenu m_ToolMenuPrefab;
-		private GameObject m_ToolMenu;
-		public InstantiateUIDelegate instantiateUI { private get; set; }
-		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
-		public Func<Transform, Type, bool> selectTool { private get; set; }
-		public Transform menuOrigin { get; set; }
-		public Transform alternateMenuOrigin { get; set; }
-		///// >>>>
-
-
-
-		void Start()
+		public override void pb_Start()
 		{
-			///// <<<<
-			m_ToolMenu = instantiateUI(m_ToolMenuPrefab.gameObject, alternateMenuOrigin, false);
-			var toolsMenu = m_ToolMenu.GetComponent<ProBuilderToolMenu>();
-			connectInterfaces(toolsMenu, rayOrigin);
-
-			toolsMenu.onSelectTranslateTool += () => { selectTool(rayOrigin, typeof(TranslateElementTool)); };
-			toolsMenu.onSelectShapeTool += () => { selectTool(rayOrigin, typeof(CreateShapeTool)); };
-			///// >>>>
-			
 			m_HighlightModule = U.Object.CreateGameObjectWithComponent<HighlightElementsModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 		}
 
-		void OnDestroy()
+		public override void pb_OnDestroy()
 		{
 			U.Object.Destroy(m_HighlightModule.gameObject);
 			U.Object.Destroy(m_AudioModule.gameObject);
-			U.Object.Destroy(m_ToolMenu);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)

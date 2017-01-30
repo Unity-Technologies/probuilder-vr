@@ -10,13 +10,12 @@ using ProBuilder2.Common;
 namespace ProBuilder2.VR
 {
 	[MainMenuItem("Create Shape", "ProBuilder", "Create geometry in the scene")]
-	public class CreateShapeTool : 	MonoBehaviour,
+	public class CreateShapeTool : 	ProBuilderToolBase,
 									ITool, 
 									IStandardActionMap,
 									IUsesRayOrigin,
 									IUsesRaycastResults,
 									IUsesSpatialHash,
-									IExclusiveMode,
 									IUsesViewerPivot
 	{
 
@@ -26,7 +25,6 @@ namespace ProBuilder2.VR
 
 		Shape m_Shape = Shape.Cube;
 
-		public Transform rayOrigin { get; set; }
 		public Transform viewerPivot { get; set; }
 		public Action<GameObject> addToSpatialHash { get; set; }
 		public Action<GameObject> removeFromSpatialHash { get; set; }
@@ -53,7 +51,7 @@ namespace ProBuilder2.VR
 
 		private RollingAverage_Vector3 rayForwardSmoothed = new RollingAverage_Vector3(Vector3.zero);
 
-		void Start()
+		public override void pb_Start()
 		{
 			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
@@ -63,7 +61,7 @@ namespace ProBuilder2.VR
 			m_GridModule.SetVisible(false);
 		}
 
-		void OnDestroy()
+		public override void pb_OnDestroy()
 		{
 			U.Object.Destroy(m_AudioModule.gameObject);
 			U.Object.Destroy(m_ShapeBounds.gameObject);

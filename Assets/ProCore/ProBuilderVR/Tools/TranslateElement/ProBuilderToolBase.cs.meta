@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 89bc23eeb4d66df4d8e9d8fa033a95d2
+timeCreated: 1485811418
+licenseType: Pro
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - m_ToolMenuPrefab: {fileID: 114000011328627756, guid: 2b94d22a615ca224086fe94ab43fddd8,
+      type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
