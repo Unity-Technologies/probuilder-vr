@@ -5,7 +5,7 @@ namespace ProBuilder2.VR
 {
 	public struct RollingAverage_Vector3
 	{
-		const int SIZE = 24;
+		const int SIZE = 16;
 		private Vector3 mValue;
 		private float mCount;
 		private int mIndex;

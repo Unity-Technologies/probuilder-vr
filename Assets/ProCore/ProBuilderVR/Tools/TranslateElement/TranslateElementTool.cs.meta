@@ -1,12 +1,14 @@
 fileFormatVersion: 2
 guid: bb2ed9d635f9f6c458f04c4ac4cfe1a3
-timeCreated: 1485199874
+timeCreated: 1485806437
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - m_Drag: {fileID: 8300000, guid: c3100be47b63aae4d8500221e72a80c3, type: 3}
   - m_Trigger: {fileID: 8300000, guid: 1cdfb31a0dadec349b2d2c2eb83299a6, type: 3}
+  - m_ToolMenuPrefab: {fileID: 114000011328627756, guid: 2b94d22a615ca224086fe94ab43fddd8,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

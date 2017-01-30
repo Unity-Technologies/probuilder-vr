@@ -1,6 +1,6 @@
 # probuilder-vr
 
-Just like ProBuilder, but in virtual reality.
+ProBuilder in the matrix.
 
 ## Quick Start
 
