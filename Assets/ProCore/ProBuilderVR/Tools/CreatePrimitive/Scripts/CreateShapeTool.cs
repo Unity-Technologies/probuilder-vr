@@ -16,7 +16,7 @@ namespace ProBuilder2.VR
 									IUsesRayOrigin,
 									IUsesRaycastResults,
 									IUsesSpatialHash,
-									IExclusiveMode, 
+									IExclusiveMode,
 									IUsesViewerPivot
 	{
 
@@ -44,6 +44,7 @@ namespace ProBuilder2.VR
 		private AShapeCreator m_CurrentShape;
 		private Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
 		private pb_Object m_HoveredObject = null;
+		private float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
 
 		private SelectionBoundsModule m_ShapeBounds;
 		private VRAudioModule m_AudioModule;
@@ -110,7 +111,7 @@ namespace ProBuilder2.VR
 		   			m_HoveredObject = pb;
 
 		   		rayCollisionPoint = pb.transform.TransformPoint(m_RaycastHit.point);
-		   		rayCollisionPoint = Snapping.Snap(rayCollisionPoint, Snapping.DEFAULT_INCREMENT, Vector3.one);
+		   		rayCollisionPoint = Snapping.Snap(rayCollisionPoint, m_SnapIncrement, Vector3.one);
 		   		m_Plane.SetNormalAndPosition( pb.transform.TransformDirection(m_RaycastHit.normal).normalized, rayCollisionPoint );
 	   		}
 	   		else
@@ -125,8 +126,15 @@ namespace ProBuilder2.VR
 			if( m_HoveredObject != null || VRMath.GetPointOnPlane(rayOrigin, m_Plane, out rayCollisionPoint) )
 			{
 				m_GridModule.SetVisible(true);
-				m_GridModule.transform.position = Snapping.Snap(rayCollisionPoint, Snapping.DEFAULT_INCREMENT, Vector3.one);
+				m_GridModule.transform.position = Snapping.Snap(rayCollisionPoint, m_SnapIncrement, Vector3.one);
 				m_GridModule.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
+
+				// Calculate the snap increment based on distance from viewer.  Split into 4 segments.
+				float distance = Mathf.Clamp(Vector3.Distance(m_GridModule.transform.position, viewerPivot.position), 0f, 10f) / 10f;
+				m_SnapIncrement = Snapping.DEFAULT_INCREMENT * System.Math.Max(1, Mathf.Pow(2, (int)(distance * 4)));
+
+				m_GridModule.SetSnapIncrement(m_SnapIncrement);
+				AShapeCreator.SetSnapIncrement(m_SnapIncrement);
 
 				m_GuideModule.transform.position = m_GridModule.transform.position;
 				m_GuideModule.transform.localRotation = m_GridModule.transform.localRotation;
