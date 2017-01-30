@@ -51,6 +51,8 @@ namespace ProBuilder2.VR
 		private GridModule m_GridModule;
 		private GuideModule m_GuideModule;
 
+		private RollingAverage_Vector3 rayForwardSmoothed = new RollingAverage_Vector3(Vector3.zero);
+
 		void Start()
 		{
 			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
@@ -104,8 +106,10 @@ namespace ProBuilder2.VR
 	   		GameObject first = getFirstGameObject(rayOrigin);
 	   		pb_Object pb = first != null ? first.GetComponent<pb_Object>() : null;
 	   		Vector3 rayCollisionPoint;
+	   		
+			Ray ray = new Ray(rayOrigin.position, rayForwardSmoothed.Add(rayOrigin.forward));
 
-	   		if(pb != null && pb_HandleUtility.FaceRaycast(new Ray(rayOrigin.position, rayOrigin.forward), pb, out m_RaycastHit))
+	   		if(pb != null && pb_HandleUtility.FaceRaycast(ray, pb, out m_RaycastHit))
 	   		{
 	   			if(m_HoveredObject == null)
 		   			m_HoveredObject = pb;
@@ -123,7 +127,7 @@ namespace ProBuilder2.VR
 	   			}
 	   		}
 
-			if( m_HoveredObject != null || VRMath.GetPointOnPlane(rayOrigin, m_Plane, out rayCollisionPoint) )
+			if( m_HoveredObject != null || VRMath.GetPointOnPlane(ray, m_Plane, out rayCollisionPoint) )
 			{
 				m_GridModule.SetVisible(true);
 				m_GridModule.transform.position = Snapping.Snap(rayCollisionPoint, m_SnapIncrement, Vector3.one);
@@ -155,7 +159,7 @@ namespace ProBuilder2.VR
 
 				// If shape initialization failed no gameobject will have been created,
 				// so don't worry about cleaning up.
-				if( m_CurrentShape.HandleStart(rayOrigin, m_Plane) )
+				if( m_CurrentShape.HandleStart(ray, m_Plane) )
 				{
 					m_AudioModule.Play(m_TriggerReleased, true);
 					m_CurrentShape.onShapeChanged = (v) =>
@@ -176,7 +180,9 @@ namespace ProBuilder2.VR
 			if(m_CurrentShape == null)
 				return;
 
-			m_CurrentShape.HandleDrag(rayOrigin);
+			Ray ray = new Ray(rayOrigin.position, rayForwardSmoothed.Add(rayOrigin.forward));
+
+			m_CurrentShape.HandleDrag(ray);
 
 			m_ShapeBounds.SetHighlight(m_CurrentShape.pbObject, true);
 
@@ -184,7 +190,7 @@ namespace ProBuilder2.VR
 			{
 				m_AudioModule.Play(m_TriggerReleased, true);
 
-				if(!m_CurrentShape.HandleTriggerRelease(rayOrigin))
+				if(!m_CurrentShape.HandleTriggerRelease(ray))
 					m_State = ShapeCreationState.StartPoint;
 
 				m_ShapeBounds.SetHighlight(m_CurrentShape.pbObject, false);

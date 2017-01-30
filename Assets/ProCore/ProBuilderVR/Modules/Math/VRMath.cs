@@ -24,10 +24,8 @@ namespace ProBuilder2.VR
 		/**
 		 * Get the point on a plane that this ray intersects.
 		 */
-		public static bool GetPointOnPlane(Transform rayOrigin, Plane plane, out Vector3 point)
+		public static bool GetPointOnPlane(Ray ray, Plane plane, out Vector3 point)
 		{
-			Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
-
 			float hit;
 
 			if( plane.Raycast(ray, out hit) )
@@ -37,7 +35,7 @@ namespace ProBuilder2.VR
 			}
 			else
 			{
-				point = rayOrigin.position;
+				point = ray.origin;
 				return false;
 			}
 		}

@@ -30,17 +30,17 @@ namespace ProBuilder2.VR
 		 * Begin drawing a shape.  If HandleStart returns false no GameObject has been created
 		 * and drawing has been aborted.
 		 */
-		public abstract bool HandleStart(Transform rayOrigin, Plane drawPlane);
+		public abstract bool HandleStart(Ray ray, Plane drawPlane);
 
 		/**
 		 * Handle drags after starting shape creation.
 		 */
-		public abstract void HandleDrag(Transform rayOrigin);
+		public abstract void HandleDrag(Ray ray);
 
 		/**
 		 * Finalize the shape.
 		 */
-		public abstract bool HandleTriggerRelease(Transform rayOrigin);
+		public abstract bool HandleTriggerRelease(Ray ray);
 
 		/**
 		 * Get the GameObject created by this instantiator.

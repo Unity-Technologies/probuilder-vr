@@ -23,11 +23,11 @@ namespace ProBuilder2.VR
 
 		State state = State.Base;
 
-		public override bool HandleStart(Transform rayOrigin, Plane drawPlane)
+		public override bool HandleStart(Ray ray, Plane drawPlane)
 		{
 			m_Plane = drawPlane;
 
-			if(!VRMath.GetPointOnPlane(rayOrigin, m_Plane, out m_StartPoint))
+			if(!VRMath.GetPointOnPlane(ray, m_Plane, out m_StartPoint))
 				return false;
 
 			m_EndPoint = Snapping.Snap(m_StartPoint, m_SnapIncrement, VECTOR3_ONE);
@@ -54,13 +54,13 @@ namespace ProBuilder2.VR
 			return true;
 		}
 
-		public override void HandleDrag(Transform rayOrigin)
+		public override void HandleDrag(Ray ray)
 		{
 			Vector3 endPoint;
 
 			if(state == State.Base)
 			{
-				VRMath.GetPointOnPlane(rayOrigin, m_Plane, out endPoint);
+				VRMath.GetPointOnPlane(ray, m_Plane, out endPoint);
 
 				// Apply simple smoothing to ray input.
 				m_EndPoint = Vector3.Lerp(m_EndPoint, endPoint, .5f);
@@ -68,7 +68,7 @@ namespace ProBuilder2.VR
 			}
 			else
 			{
-				endPoint = VRMath.CalculateNearestPointRayRay(rayOrigin.position, rayOrigin.forward, m_BaseEndPoint, m_Plane.normal);
+				endPoint = VRMath.CalculateNearestPointRayRay(ray.origin, ray.direction, m_BaseEndPoint, m_Plane.normal);
 				Vector3 dir = endPoint - m_BaseEndPoint;
 				dir.Normalize();
 				float m = Vector3.Dot(m_Plane.normal, dir) / 1f;
@@ -80,7 +80,7 @@ namespace ProBuilder2.VR
 			UpdateShape();
 		}
 
-		public override bool HandleTriggerRelease(Transform rayOrigin)
+		public override bool HandleTriggerRelease(Ray ray)
 		{
 			if(state == State.Base)
 			{
