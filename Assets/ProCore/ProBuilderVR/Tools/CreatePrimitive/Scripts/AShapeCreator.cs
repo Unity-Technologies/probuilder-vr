@@ -35,7 +35,7 @@ namespace ProBuilder2.VR
 		/**
 		 * Handle drags after starting shape creation.
 		 */
-		public abstract void HandleDrag(Ray ray);
+		public abstract bool HandleDrag(Ray ray, ref Vector3 planeIntersection);
 
 		/**
 		 * Finalize the shape.

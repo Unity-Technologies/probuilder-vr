@@ -54,30 +54,29 @@ namespace ProBuilder2.VR
 			return true;
 		}
 
-		public override void HandleDrag(Ray ray)
+		public override bool HandleDrag(Ray ray, ref Vector3 planeIntersection)
 		{
-			Vector3 endPoint;
-
 			if(state == State.Base)
 			{
-				VRMath.GetPointOnPlane(ray, m_Plane, out endPoint);
-
-				// Apply simple smoothing to ray input.
-				m_EndPoint = Vector3.Lerp(m_EndPoint, endPoint, .5f);
+				VRMath.GetPointOnPlane(ray, m_Plane, out planeIntersection);
+				m_EndPoint = planeIntersection;
 				m_EndPoint = Snapping.Snap(m_EndPoint, m_SnapIncrement, VECTOR3_ONE);
 			}
 			else
 			{
-				endPoint = VRMath.CalculateNearestPointRayRay(ray.origin, ray.direction, m_BaseEndPoint, m_Plane.normal);
-				Vector3 dir = endPoint - m_BaseEndPoint;
+				planeIntersection = VRMath.CalculateNearestPointRayRay(ray.origin, ray.direction, m_BaseEndPoint, m_Plane.normal);
+				Vector3 dir = planeIntersection - m_BaseEndPoint;
 				dir.Normalize();
 				float m = Vector3.Dot(m_Plane.normal, dir) / 1f;
-				float distance = Vector3.Distance(endPoint, m_BaseEndPoint) * m;
+				float distance = Vector3.Distance(planeIntersection, m_BaseEndPoint) * m;
 				distance = Snapping.Snap(distance, m_SnapIncrement);
 				m_EndPoint = m_BaseEndPoint + (m_Plane.normal * distance);
 			}
 
 			UpdateShape();
+
+			// @todo sanity check ray input to prevent gigantic shapes
+			return true;
 		}
 
 		public override bool HandleTriggerRelease(Ray ray)
