@@ -64,7 +64,7 @@ namespace ProBuilder2.VR
 				new Vector3( 1f * x,       0f,        0f),
 				new Vector3(      0f, -1f * y,        0f),
 				new Vector3(      0f,  1f * y,        0f),
-				new Vector3(      0f,       0f,  -1f * z),
+				new Vector3(      0f,       0f,   0f * z),
 				new Vector3(      0f,       0f,   1f * z)
 			};
 			m.colors32 = Enumerable.Repeat(color, 6).ToArray();
