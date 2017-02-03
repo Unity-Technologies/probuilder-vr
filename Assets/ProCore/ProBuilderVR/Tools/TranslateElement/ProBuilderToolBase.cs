@@ -27,6 +27,10 @@ namespace ProBuilder2.VR
 		public Transform alternateMenuOrigin { get; set; }
 		public Transform rayOrigin { get; set; }
 
+		// Disable the selection tool to turn of the hover highlight.  Not using
+		// IExclusiveMode because we still want locomotion.
+		private SelectionTool m_SelectionTool = null;
+
 		private void Start()
 		{
 			if(m_ToolMenuPrefab == null)
@@ -42,11 +46,24 @@ namespace ProBuilder2.VR
 				toolsMenu.onSelectShapeTool += () => { selectTool(rayOrigin, typeof(CreateShapeTool)); };
 			}
 
+			m_SelectionTool = gameObject.GetComponent<SelectionTool>();
+
+			if(m_SelectionTool != null)
+			{
+				m_SelectionTool.enabled = false;
+			}
+
 			pb_Start();
 		}
 
 		private void OnDestroy()
 		{
+			if(m_SelectionTool != null)
+			{
+				Debug.Log("Found the little bastard");
+				m_SelectionTool.enabled = true;
+			}
+
 			if(m_ToolMenuPrefab != null)
 				U.Object.Destroy(m_ToolMenu);
 
