@@ -19,6 +19,7 @@ namespace ProBuilder2.VR
 										IUsesMenuOrigins
 	{
 		[SerializeField] private ProBuilderToolMenu m_ToolMenuPrefab;
+
 		private GameObject m_ToolMenu;
 		public InstantiateUIDelegate instantiateUI { private get; set; }
 		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
@@ -45,7 +46,7 @@ namespace ProBuilder2.VR
 				toolsMenu.onSelectTranslateTool += () => { selectTool(rayOrigin, typeof(TranslateElementTool)); };
 				toolsMenu.onSelectShapeTool += () => { selectTool(rayOrigin, typeof(CreateShapeTool)); };
 			}
-
+				
 			m_SelectionTool = gameObject.GetComponent<SelectionTool>();
 
 			if(m_SelectionTool != null)
@@ -61,7 +62,7 @@ namespace ProBuilder2.VR
 			if(m_SelectionTool != null)
 				m_SelectionTool.enabled = true;
 
-			if(m_ToolMenuPrefab != null)
+			if(m_ToolMenu != null)
 				U.Object.Destroy(m_ToolMenu);
 
 			pb_OnDestroy();

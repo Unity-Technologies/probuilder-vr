@@ -1,11 +1,13 @@
 fileFormatVersion: 2
 guid: 70b47b7ac7f46e04b98822c5614ae421
-timeCreated: 1486133776
+timeCreated: 1486155329
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
   defaultReferences:
   - m_ToolMenuPrefab: {fileID: 114000011328627756, guid: 2b94d22a615ca224086fe94ab43fddd8,
+      type: 2}
+  - m_3DGizmoPrefab: {fileID: 114000011056700410, guid: e27015b6a0e00014e9c22e9a7b440bd8,
       type: 2}
   - m_TriggerReleased: {fileID: 8300000, guid: 1cdfb31a0dadec349b2d2c2eb83299a6, type: 3}
   - m_DragAudio: {fileID: 8300000, guid: c3100be47b63aae4d8500221e72a80c3, type: 3}

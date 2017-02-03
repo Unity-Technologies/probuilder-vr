@@ -10,6 +10,7 @@ using UnityEngine.InputNew;
 using UnityEngine.Experimental.EditorVR;
 using UnityEngine.Experimental.EditorVR.Menus;
 using UnityEngine.Experimental.EditorVR.Tools;
+using UnityEngine.Experimental.EditorVR.Modules;
 using UnityEngine.Experimental.EditorVR.Utilities;
 using ProBuilder2.Common;
 
@@ -37,6 +38,9 @@ namespace ProBuilder2.VR
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 		public Action<GameObject, bool> setHighlight { get; set; }
 
+		public Color32 highlightFaceColor = new Color32(0, 188, 212, 96);
+		public Color32 directSelectFaceColor = new Color32(212, 0, 171, 96);
+
 		private HighlightElementsModule m_HighlightModule = null;
 		private VRAudioModule m_AudioModule = null;
 		private HeightGuideModule m_GuideModule = null;
@@ -44,13 +48,15 @@ namespace ProBuilder2.VR
 		const float MAX_TRANSLATE_DISTANCE = 100f;
 		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
 		private float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
+		private float m_DirectSelectThreshold = .01f;
 
 	   	private CreateState m_State = CreateState.Start;
 	   	private bool m_Dragging = false;
+	   	private bool m_IsDirectSelect = false;
 	   	private Vector3 m_DragOrigin = Vector3.zero;
 		private Vector3 m_DragDirection = Vector3.zero;
+		private Vector3 m_Offset = Vector3.zero;
 		private Vector3 m_DraggedPoint = Vector3.zero;
-		private Vector3 m_PreviousLinePosition = Vector3.zero;
 		private Vector3 m_PreviousVertexTranslation = Vector3.zero;
 		
 		private pb_Object m_Object;
@@ -65,6 +71,7 @@ namespace ProBuilder2.VR
 			m_GuideModule = U.Object.CreateGameObjectWithComponent<HeightGuideModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 			m_GuideModule.SetVisible(false);
+			try { m_DirectSelectThreshold = rayOrigin.GetComponentInChildren<DefaultProxyRay>().pointerLength * 1.3f; } catch {}
 		}
 
 		public override void pb_OnDestroy()
@@ -109,9 +116,14 @@ namespace ProBuilder2.VR
 			pb_RaycastHit hit;
 
 			if( pb_HandleUtility.FaceRaycast(new Ray(rayOrigin.position, rayOrigin.forward), pb, out hit) )
-			{
+			{		
+				m_IsDirectSelect = hit.distance < m_DirectSelectThreshold;
+
 				if(m_HighlightModule != null)
+				{
+					m_HighlightModule.color = m_IsDirectSelect ? directSelectFaceColor : highlightFaceColor;
 					m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] }, true);
+				}
 
 				setHighlight(pb.gameObject, false);
 
@@ -168,19 +180,22 @@ namespace ProBuilder2.VR
 			}
 			else
 			{
-				m_DraggedPoint = VRMath.CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
+				if(m_IsDirectSelect)
+					m_DraggedPoint = m_DragOrigin + (Vector3.Project(rayOrigin.position - m_DragOrigin, m_DragDirection));
+				else
+					m_DraggedPoint = VRMath.CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
 
 				if(!m_Dragging)
 				{
-					m_PreviousLinePosition = m_DraggedPoint;	
+					m_Offset = m_IsDirectSelect ? m_DraggedPoint - m_DragOrigin : Vector3.zero;
 					m_Dragging = true;
 				}
 
-				Vector3 smoothedDragPoint = Vector3.Lerp(m_PreviousLinePosition, m_DraggedPoint, .5f);
+				m_DraggedPoint -= m_Offset;
+
 				Vector3 localDragOrigin = m_Object.transform.InverseTransformPoint(m_DragOrigin);
-				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(smoothedDragPoint);
+				Vector3 localDraggedPoint = m_Object.transform.InverseTransformPoint(m_DraggedPoint);
 				Vector3 vertexTranslation = localDraggedPoint - localDragOrigin;
-				m_PreviousLinePosition = m_DraggedPoint;
 
 				if(vertexTranslation.magnitude > MAX_TRANSLATE_DISTANCE)
 					vertexTranslation = vertexTranslation.normalized * MAX_TRANSLATE_DISTANCE;

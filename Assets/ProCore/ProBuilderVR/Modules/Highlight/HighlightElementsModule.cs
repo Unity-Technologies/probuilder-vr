@@ -15,6 +15,7 @@ namespace ProBuilder2.VR
 		[SerializeField]
 		private Material m_HighlightMaterial;
 		private readonly Dictionary<pb_Object, Mesh> m_Highlights = new Dictionary<pb_Object, Mesh>();
+		private Color32 m_CurrentColor = new Color32(0,0,0,0);
 
 		void LateUpdate()
 		{
@@ -32,6 +33,18 @@ namespace ProBuilder2.VR
 			Clear();
 		}
 
+		public Color32 color
+		{
+			set
+			{
+				if(!m_CurrentColor.Equals(value))
+				{
+					m_CurrentColor = value;
+					m_HighlightMaterial.color = value;
+				}
+			}
+		}
+
 		public void Clear()
 		{
 			List<Mesh> m = m_Highlights.Values.ToList();
@@ -43,7 +56,7 @@ namespace ProBuilder2.VR
 		}
 
 		/**
-		 * Highlight a set of faces on a pb_Object.
+		 * Highlight a set of faces on a pb_Object.  If exclusive is true also clear any other pb_Objects that had been highlighted.
 		 */
 		public void SetFaceHighlight(pb_Object pb, pb_Face[] faces, bool exclusive = false)
 		{
