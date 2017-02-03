@@ -16,12 +16,15 @@ namespace ProBuilder2.VR
 									IUsesRayOrigin,
 									IUsesRaycastResults,
 									IUsesSpatialHash,
-									IUsesViewerPivot
+									IUsesViewerPivot,
+									ICustomRay
 	{
 
 		[SerializeField] private AudioClip m_TriggerReleased;
 		[SerializeField] private AudioClip m_DragAudio;
 		[SerializeField] private Material m_HighlightMaterial;
+
+		[SerializeField] private DefaultProxyRay m_ProxyRayPrefab;
 
 		Shape m_Shape = Shape.Cube;
 
@@ -29,6 +32,12 @@ namespace ProBuilder2.VR
 		public Action<GameObject> addToSpatialHash { get; set; }
 		public Action<GameObject> removeFromSpatialHash { get; set; }
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
+
+	   	// ICustomRay
+		public DefaultRayVisibilityDelegate showDefaultRay { get; set; }
+		public DefaultRayVisibilityDelegate hideDefaultRay { get; set; }
+		public Func<Transform, object, bool> lockRay { get; set; }
+		public Func<Transform, object, bool> unlockRay { get; set; }
 
 		enum ShapeCreationState
 		{
@@ -48,6 +57,7 @@ namespace ProBuilder2.VR
 		private VRAudioModule m_AudioModule;
 		private GridModule m_GridModule;
 		private GuideModule m_GuideModule;
+		private DefaultProxyRay m_ProxyRay;
 
 		private RollingAverage_Vector3 rayForwardSmoothed = new RollingAverage_Vector3(Vector3.zero);
 
@@ -57,8 +67,15 @@ namespace ProBuilder2.VR
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 			m_GridModule = U.Object.CreateGameObjectWithComponent<GridModule>();
 			m_GuideModule = U.Object.CreateGameObjectWithComponent<GuideModule>();
-
 			m_GridModule.SetVisible(false);
+
+			m_ProxyRay = U.Object.Instantiate(m_ProxyRayPrefab.gameObject).GetComponent<DefaultProxyRay>();
+			m_ProxyRay.transform.position = Vector3.zero;
+			m_ProxyRay.transform.localRotation = Quaternion.identity;
+			m_ProxyRay.transform.SetParent(rayOrigin, false);
+
+			hideDefaultRay(rayOrigin);
+			lockRay(rayOrigin, this);
 		}
 
 		public override void pb_OnDestroy()
@@ -67,6 +84,10 @@ namespace ProBuilder2.VR
 			U.Object.Destroy(m_ShapeBounds.gameObject);
 			U.Object.Destroy(m_GridModule.gameObject);
 			U.Object.Destroy(m_GuideModule.gameObject);
+			U.Object.Destroy(m_ProxyRay.gameObject);
+			
+			showDefaultRay(rayOrigin);
+			unlockRay(rayOrigin, this);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -127,6 +148,8 @@ namespace ProBuilder2.VR
 
 			if( m_HoveredObject != null || VRMath.GetPointOnPlane(ray, m_Plane, out rayCollisionPoint) )
 			{
+				m_ProxyRay.SetLength(Vector3.Distance(rayCollisionPoint, ray.origin));
+
 				m_GridModule.SetVisible(true);
 				m_GridModule.transform.position = Snapping.Snap(rayCollisionPoint, m_SnapIncrement, Vector3.one);
 				m_GridModule.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
@@ -180,7 +203,12 @@ namespace ProBuilder2.VR
 
 			Ray ray = new Ray(rayOrigin.position, rayForwardSmoothed.Add(rayOrigin.forward));
 
-			m_CurrentShape.HandleDrag(ray);
+			Vector3 planeIntersect = Vector3.zero;
+
+			if( m_CurrentShape.HandleDrag(ray, ref planeIntersect) )
+			{
+				m_ProxyRay.SetLength(Vector3.Distance(planeIntersect, rayOrigin.position));
+			}
 
 			m_ShapeBounds.SetHighlight(m_CurrentShape.pbObject, true);
 

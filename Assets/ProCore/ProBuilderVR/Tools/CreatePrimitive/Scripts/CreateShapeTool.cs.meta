@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: 70b47b7ac7f46e04b98822c5614ae421
-timeCreated: 1485811886
+timeCreated: 1486133776
 licenseType: Pro
 MonoImporter:
   serializedVersion: 2
@@ -10,6 +10,8 @@ MonoImporter:
   - m_TriggerReleased: {fileID: 8300000, guid: 1cdfb31a0dadec349b2d2c2eb83299a6, type: 3}
   - m_DragAudio: {fileID: 8300000, guid: c3100be47b63aae4d8500221e72a80c3, type: 3}
   - m_HighlightMaterial: {fileID: 2100000, guid: 331e7f34b37199d4faa61fb6643e35df,
+      type: 2}
+  - m_ProxyRayPrefab: {fileID: 114000010564953552, guid: 6c037b4595ca1ab4c921efeac9524073,
       type: 2}
   executionOrder: 0
   icon: {instanceID: 0}

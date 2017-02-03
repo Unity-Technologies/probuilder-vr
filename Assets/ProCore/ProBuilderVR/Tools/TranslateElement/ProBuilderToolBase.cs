@@ -59,10 +59,7 @@ namespace ProBuilder2.VR
 		private void OnDestroy()
 		{
 			if(m_SelectionTool != null)
-			{
-				Debug.Log("Found the little bastard");
 				m_SelectionTool.enabled = true;
-			}
 
 			if(m_ToolMenuPrefab != null)
 				U.Object.Destroy(m_ToolMenu);
