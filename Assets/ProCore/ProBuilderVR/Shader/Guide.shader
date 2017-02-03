@@ -10,7 +10,8 @@
 		ZTest LEqual
 		ZWrite On
 		Cull Off
-		Blend OneMinusDstColor One
+		// Blend OneMinusDstColor One
+		Blend SrcAlpha OneMinusSrcAlpha
 		
 		Pass
 		{

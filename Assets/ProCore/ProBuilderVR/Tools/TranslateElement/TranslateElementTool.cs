@@ -39,6 +39,8 @@ namespace ProBuilder2.VR
 
 		private HighlightElementsModule m_HighlightModule = null;
 		private VRAudioModule m_AudioModule = null;
+		private HeightGuideModule m_GuideModule = null;
+
 		const float MAX_TRANSLATE_DISTANCE = 100f;
 		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
 		private float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
@@ -60,13 +62,16 @@ namespace ProBuilder2.VR
 		public override void pb_Start()
 		{
 			m_HighlightModule = U.Object.CreateGameObjectWithComponent<HighlightElementsModule>();
+			m_GuideModule = U.Object.CreateGameObjectWithComponent<HeightGuideModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
+			m_GuideModule.SetVisible(false);
 		}
 
 		public override void pb_OnDestroy()
 		{
 			U.Object.Destroy(m_HighlightModule.gameObject);
 			U.Object.Destroy(m_AudioModule.gameObject);
+			U.Object.Destroy(m_GuideModule.gameObject);
 		}
 
 		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
@@ -125,6 +130,13 @@ namespace ProBuilder2.VR
 				m_DragDirection = pb.transform.TransformDirection(hit.normal);
 				m_DragDirection.Normalize();
 
+				if(m_GuideModule != null)
+				{
+					m_GuideModule.SetVisible(true);
+					m_GuideModule.transform.position = m_DragOrigin;
+					m_GuideModule.transform.rotation = Quaternion.LookRotation(m_DragDirection);
+				}
+
 				m_State = CreateState.Finish;
 
 				m_Positions = new Vector3[pb.vertexCount];
@@ -146,9 +158,11 @@ namespace ProBuilder2.VR
 			if (input.action.wasJustReleased)
 			{
 				m_AudioModule.Play(m_Trigger, true);
+				m_GuideModule.SetVisible(false);
+				m_HighlightModule.SetFaceHighlight(m_Object, null);
+				
 				m_Dragging = false;
 				m_State = CreateState.Start;
-				m_HighlightModule.SetFaceHighlight(m_Object, null);
 				m_Object.ToMesh();
 				m_Object.Refresh();
 			}
