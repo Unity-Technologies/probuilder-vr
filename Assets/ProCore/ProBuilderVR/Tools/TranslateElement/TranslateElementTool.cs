@@ -48,7 +48,7 @@ namespace ProBuilder2.VR
 		const float MAX_TRANSLATE_DISTANCE = 100f;
 		private static readonly Vector3 VECTOR3_ONE = Vector3.one;
 		private float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
-		private float m_DirectSelectThreshold = .01f;
+		private float m_DirectSelectThreshold = .1f;
 
 	   	private CreateState m_State = CreateState.Start;
 	   	private bool m_Dragging = false;
@@ -71,7 +71,8 @@ namespace ProBuilder2.VR
 			m_GuideModule = U.Object.CreateGameObjectWithComponent<HeightGuideModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 			m_GuideModule.SetVisible(false);
-			try { m_DirectSelectThreshold = rayOrigin.GetComponentInChildren<DefaultProxyRay>().pointerLength * 1.3f; } catch {}
+			try {
+			m_DirectSelectThreshold = Mathf.Max(m_DirectSelectThreshold, rayOrigin.GetComponentInChildren<DefaultProxyRay>().pointerLength * 1.3f); } catch {}
 		}
 
 		public override void pb_OnDestroy()
