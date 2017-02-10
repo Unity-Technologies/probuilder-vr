@@ -25,18 +25,18 @@ If you're only interested in releases, follow the Super Quick Start steps.
 
 ## FAQ
 
-#### `IUsesMenuOrigin not found`
+### `IUsesMenuOrigin not found`
 
 You downloaded the EditorVR unity package.  Delete the `EditorVR` folder and import `ProBuilderVR-with-dependencies.unitypackage`
 
-####  Nothing is working!
+###  Nothing is working!
 
 Like, nothing nothing?  Try asking about that over at the [Unity EditorVR forum](https://forum.unity3d.com/forums/editorvr.126/).
 
-#### ProBuilderVR specifically isn't working!
+### ProBuilderVR specifically isn't working!
 
 Please open an Issue on Github explaining the problem in as much detail as possible.
 
-#### I Have a Suggestion / Complaint
+### I Have a Suggestion / Complaint
 
 Suggestions, comments, high fives, etc are welcome over at our [forum](http://www.procore3d.com/forum/forum/43-probuildervr/).
