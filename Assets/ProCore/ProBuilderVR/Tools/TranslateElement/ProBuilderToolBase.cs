@@ -12,6 +12,9 @@ using System.Reflection;
 
 namespace ProBuilder2.VR
 {
+	/**
+	 *	Defines some common behaviors among ProBuilderVR tools.
+	 */
 	public class ProBuilderToolBase : 	MonoBehaviour,
 										IUsesRayOrigin,
 										IConnectInterfaces,
@@ -55,6 +58,9 @@ namespace ProBuilder2.VR
 				m_SelectionTool.enabled = false;
 			}
 
+			// In order to use some HandleUtility functions we'll need access to the OnSceneGUI delegate.  
+			// This hooks up that event.
+			// @todo - Ask Unity team about making this less hack-y.
 			foreach(EditorWindow win in Resources.FindObjectsOfTypeAll<EditorWindow>())
 			{
 				if(win.GetType().ToString().Contains("VRView"))

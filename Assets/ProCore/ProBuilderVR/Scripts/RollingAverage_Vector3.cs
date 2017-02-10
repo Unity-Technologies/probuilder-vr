@@ -3,7 +3,10 @@ using System.Collections;
 
 namespace ProBuilder2.VR
 {
-	public struct RollingAverage_Vector3
+	/**
+	 *	Smooth out a vector3 over SIZE frames.
+	 */
+	internal struct RollingAverage_Vector3
 	{
 		const int SIZE = 16;
 		private Vector3 mValue;
