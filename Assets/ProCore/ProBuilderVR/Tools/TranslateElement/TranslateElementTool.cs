@@ -71,8 +71,7 @@ namespace ProBuilder2.VR
 			m_GuideModule = U.Object.CreateGameObjectWithComponent<HeightGuideModule>();
 			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
 			m_GuideModule.SetVisible(false);
-			try {
-			m_DirectSelectThreshold = Mathf.Max(m_DirectSelectThreshold, rayOrigin.GetComponentInChildren<DefaultProxyRay>().pointerLength * 1.3f); } catch {}
+			try { m_DirectSelectThreshold = Mathf.Max(m_DirectSelectThreshold, rayOrigin.GetComponentInChildren<DefaultProxyRay>().pointerLength * 1.3f); } catch {}
 		}
 
 		public override void pb_OnDestroy()
@@ -92,6 +91,12 @@ namespace ProBuilder2.VR
 			{
 				HandleFinish( (Standard) input, consumeControl );
 			}
+		}
+
+		public override void OnSceneGUI(EditorWindow win)
+		{
+			Vector3 nearest;
+			Snapping.FindNearestVertex(new Ray(rayOrigin.position, rayOrigin.forward), out nearest);
 		}
 
 		private void HandleStart(Standard input, Action<InputControl> consumeControl)

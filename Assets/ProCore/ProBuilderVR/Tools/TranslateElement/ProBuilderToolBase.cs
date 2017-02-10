@@ -8,6 +8,7 @@ using UnityEngine.Experimental.EditorVR;
 using UnityEngine.Experimental.EditorVR.Menus;
 using UnityEngine.Experimental.EditorVR.Tools;
 using UnityEngine.Experimental.EditorVR.Utilities;
+using System.Reflection;
 
 namespace ProBuilder2.VR
 {
@@ -27,7 +28,7 @@ namespace ProBuilder2.VR
 		public Transform menuOrigin { get; set; }
 		public Transform alternateMenuOrigin { get; set; }
 		public Transform rayOrigin { get; set; }
-
+		
 		// Disable the selection tool to turn of the hover highlight.  Not using
 		// IExclusiveMode because we still want locomotion.
 		private SelectionTool m_SelectionTool = null;
@@ -54,11 +55,45 @@ namespace ProBuilder2.VR
 				m_SelectionTool.enabled = false;
 			}
 
+			foreach(EditorWindow win in Resources.FindObjectsOfTypeAll<EditorWindow>())
+			{
+				if(win.GetType().ToString().Contains("VRView"))
+				{
+					Type vrViewType = win.GetType();
+
+					EventInfo eventInfo = vrViewType.GetEvent("onGUIDelegate", BindingFlags.Public | BindingFlags.Static);
+					Delegate onGUIDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType,
+						this,
+						typeof(ProBuilderToolBase).GetMethod("OnGUIInternal", BindingFlags.Instance | BindingFlags.NonPublic) );
+					eventInfo.AddEventHandler(this, onGUIDelegate);
+				}
+			}
+
 			pb_Start();
+		}
+
+		private void OnGUIInternal(EditorWindow window)
+		{
+			OnSceneGUI(window);
 		}
 
 		private void OnDestroy()
 		{
+			foreach(EditorWindow win in Resources.FindObjectsOfTypeAll<EditorWindow>())
+			{
+				if(win.GetType().ToString().Contains("VRView"))
+				{
+					Type vrViewType = win.GetType();
+
+					EventInfo eventInfo = vrViewType.GetEvent("onGUIDelegate", BindingFlags.Public | BindingFlags.Static);
+					Delegate onGUIDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType,
+						this,
+						typeof(ProBuilderToolBase).GetMethod("OnGUIInternal", BindingFlags.Instance | BindingFlags.NonPublic) );
+					eventInfo.RemoveEventHandler(this, onGUIDelegate);
+				}
+			}
+
+
 			if(m_SelectionTool != null)
 				m_SelectionTool.enabled = true;
 
@@ -69,6 +104,8 @@ namespace ProBuilder2.VR
 		}
 
 		public virtual void pb_Start() {}
+
+		public virtual void OnSceneGUI(EditorWindow window) {}
 
 		public virtual void pb_OnDestroy() {}
 	}
