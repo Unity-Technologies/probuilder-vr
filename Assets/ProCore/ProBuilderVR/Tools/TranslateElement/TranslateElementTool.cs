@@ -215,6 +215,7 @@ namespace ProBuilder2.VR
 				m_Object.SetVertices(m_SettingPositions);
 				m_Object.msh.vertices = m_SettingPositions;
 				m_Object.RefreshUV();
+				m_Object.msh.RecalculateBounds();
 				m_HighlightModule.UpdateVertices(m_Object);
 			}
 			
