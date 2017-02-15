@@ -29,7 +29,7 @@ namespace ProBuilder2.VR
 		{
 			return snapValue * Mathf.Ceil(val / snapValue);
 		}
-		
+
 		/**
 		 * Snap a Vector3 to the nearest on-grid point.
 		 */
@@ -89,7 +89,6 @@ namespace ProBuilder2.VR
 		public static bool FindNearestVertex(Ray ray, out Vector3 vertex)
 		{
 #if UNITY_EDITOR
-
 			PushCamera(ray, null);
 
 			Transform[] objects = HandleUtility.PickRectObjects(new Rect(0, 0, Screen.width, Screen.height)).Select(x => x.transform).ToArray();
@@ -99,8 +98,6 @@ namespace ProBuilder2.VR
 			if(m_FindNearestVertexMethod == null)
 				m_FindNearestVertexMethod = typeof(HandleUtility).GetMethod("FindNearestVertex", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
 
-			if(m_FindNearestVertexMethod == null)
-				Debug.Log("FUCK");
 			object result = m_FindNearestVertexMethod.Invoke(null, parameters);
 
 			vertex = (bool) result ? (Vector3)parameters[2] : Vector3.zero;
