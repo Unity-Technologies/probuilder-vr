@@ -186,7 +186,8 @@ namespace ProBuilder2.VR
 			}
 			else
 			{
-				m_HighlightModule.SetFaceHighlight(pb, null);
+				if(m_HighlightModule != null)
+					m_HighlightModule.SetFaceHighlight(pb, null);
 			}
 		}
 

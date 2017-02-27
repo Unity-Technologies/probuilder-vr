@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEditor;
 #endif
+using UnityEditor.Experimental.EditorVR;
 
 namespace ProBuilder2.VR
 {
@@ -74,9 +75,7 @@ namespace ProBuilder2.VR
 		private static void PushCamera(Ray ray, Camera camera)
 		{
 			if(m_HandleCamera == null)
-			{
 				m_HandleCamera = (Camera) U.Object.CreateGameObjectWithComponent(typeof(Camera));
-			}
 
 			m_CurrentCamera = camera;
 
@@ -93,6 +92,7 @@ namespace ProBuilder2.VR
 		{
 			RenderTexture.ReleaseTemporary(m_HandleCamera.targetTexture);
 			m_HandleCamera.targetTexture = null;
+			GameObject.DestroyImmediate(m_HandleCamera.gameObject);
 
 			if(m_CurrentCamera != null)
 				Camera.SetupCurrent(m_CurrentCamera);
@@ -131,7 +131,6 @@ namespace ProBuilder2.VR
 		public static bool FindNearestVertex2(Ray ray, GameObject[] targets, out Vector3 point, out Vector3 vertex)
 		{
 #if UNITY_EDITOR
-			PushCamera(ray, null);
 
 			if(m_PickGameObjectMethod == null)
 				m_PickGameObjectMethod = typeof(HandleUtility).GetMethod(
@@ -141,7 +140,7 @@ namespace ProBuilder2.VR
 					new System.Type[] {typeof(Vector2), typeof(bool), typeof(GameObject[]), typeof(GameObject[]) },
 					null);
 
-			// internal static GameObject PickGameObject(Vector2 position, bool selectPrefabRoot, GameObject[] ignore, GameObject[] filter)
+			PushCamera(ray, null);
 
 			object[] pickGameObjectParams = new object[] {
 				(Vector2) m_HandleCamera.pixelRect.center,
@@ -150,16 +149,7 @@ namespace ProBuilder2.VR
 				targets
 			};
 
-			object res = null;
-
-			try
-			{
-				res = m_PickGameObjectMethod.Invoke(null, pickGameObjectParams);
-			}
-			catch
-			{
-
-			}
+			object res = m_PickGameObjectMethod.Invoke(null, pickGameObjectParams);
 
 			PopCamera();
 
