@@ -80,7 +80,7 @@ namespace ProBuilder2.VR
 
 		private void OnGUIInternal(EditorWindow window)
 		{
-			OnSceneGUI(window);
+			pb_OnSceneGUI(window);
 		}
 
 		private void OnDestroy()
@@ -111,7 +111,7 @@ namespace ProBuilder2.VR
 
 		public virtual void pb_Start() {}
 
-		public virtual void OnSceneGUI(EditorWindow window) {}
+		public virtual void pb_OnSceneGUI(EditorWindow window) {}
 
 		public virtual void pb_OnDestroy() {}
 	}

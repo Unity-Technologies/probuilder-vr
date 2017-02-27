@@ -93,7 +93,7 @@ namespace ProBuilder2.VR
 			}
 		}
 
-		public override void OnSceneGUI(EditorWindow win)
+		public override void pb_OnSceneGUI(EditorWindow win)
 		{
 			Vector3 nearest;
 			Snapping.FindNearestVertex(new Ray(rayOrigin.position, rayOrigin.forward), out nearest);
