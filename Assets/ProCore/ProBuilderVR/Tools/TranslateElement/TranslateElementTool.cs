@@ -35,6 +35,8 @@ namespace ProBuilder2.VR
 			Finish
 		}
 
+		const float MAX_VERTEX_SNAP_DISTANCE = .5f;
+
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 		public Action<GameObject, bool> setHighlight { get; set; }
 
@@ -57,8 +59,9 @@ namespace ProBuilder2.VR
 		private Vector3 m_DragDirection = Vector3.zero;
 		private Vector3 m_Offset = Vector3.zero;
 		private Vector3 m_DraggedPoint = Vector3.zero;
+		private Transform[] m_ProBuilderObjectsInScene = null;
 		private Vector3 m_PreviousVertexTranslation = Vector3.zero;
-		
+
 		private pb_Object m_Object;
 		private pb_Face m_Face;
 		private IEnumerable<int> m_SelectedIndices;
@@ -93,10 +96,36 @@ namespace ProBuilder2.VR
 			}
 		}
 
+		struct VertexSnap
+		{
+			public bool valid;
+
+			public Vector3 point;
+
+			public VertexSnap(bool valid, Vector3 point)
+			{
+				this.valid = valid;
+				this.point = point;
+			}
+		}
+
+		VertexSnap m_VertexSnap = new VertexSnap(false, Vector3.zero);
+
 		public override void pb_OnSceneGUI(EditorWindow win)
 		{
-			Vector3 nearest;
-			Snapping.FindNearestVertex(new Ray(rayOrigin.position, rayOrigin.forward), out nearest);
+			if(m_State == CreateState.Finish && m_Object != null)
+			{
+				m_VertexSnap.valid = Snapping.FindNearestVertex(new Ray(rayOrigin.position, rayOrigin.forward), m_ProBuilderObjectsInScene, out m_VertexSnap.point);
+
+				if(m_VertexSnap.valid)
+				{
+					m_VertexSnap.valid = HandleUtility.DistancePointLine(m_VertexSnap.point, rayOrigin.position, rayOrigin.position + rayOrigin.forward * 100f) < MAX_VERTEX_SNAP_DISTANCE;
+				}
+			}
+			else
+			{
+				m_VertexSnap.valid = false;
+			}
 		}
 
 		private void HandleStart(Standard input, Action<InputControl> consumeControl)
@@ -156,6 +185,7 @@ namespace ProBuilder2.VR
 				}
 
 				m_State = CreateState.Finish;
+				m_ProBuilderObjectsInScene = UnityEngine.Object.FindObjectsOfType<pb_Object>().Where(x => x != m_Object).Select(y => y.transform).ToArray();
 
 				m_Positions = new Vector3[pb.vertexCount];
 				m_SettingPositions = new Vector3[pb.vertexCount];
@@ -188,6 +218,8 @@ namespace ProBuilder2.VR
 			{
 				if(m_IsDirectSelect)
 					m_DraggedPoint = m_DragOrigin + (Vector3.Project(rayOrigin.position - m_DragOrigin, m_DragDirection));
+				else if(m_VertexSnap.valid)
+					m_DraggedPoint = m_DragOrigin + (Vector3.Project(m_VertexSnap.point - m_DragOrigin, m_DragDirection));
 				else
 					m_DraggedPoint = VRMath.CalculateNearestPointRayRay(m_DragOrigin, m_DragDirection, rayOrigin.position, rayOrigin.forward);
 

@@ -9,6 +9,7 @@ using UnityEditor;
 
 namespace ProBuilder2.VR
 {
+
 	public static class Snapping
 	{
 		const float EPSILON = .0001f;
@@ -84,16 +85,14 @@ namespace ProBuilder2.VR
 #endif
 
 		/**
-		 * Find the nearest vertex among all visible objects.
+		 * Find the nearest vertex among all visible objects.  Must be called from OnSceneGUI.
 		 */
-		public static bool FindNearestVertex(Ray ray, out Vector3 vertex)
+		public static bool FindNearestVertex(Ray ray, Transform[] targets, out Vector3 vertex)
 		{
 #if UNITY_EDITOR
 			PushCamera(ray, null);
 
-			Transform[] objects = HandleUtility.PickRectObjects(new Rect(0, 0, Screen.width, Screen.height)).Select(x => x.transform).ToArray();
-
-			object[] parameters = new object[] { (Vector2) m_HandleCamera.pixelRect.center, objects, null };
+			object[] parameters = new object[] { (Vector2) m_HandleCamera.pixelRect.center, targets, null };
 
 			if(m_FindNearestVertexMethod == null)
 				m_FindNearestVertexMethod = typeof(HandleUtility).GetMethod("FindNearestVertex", BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance);
