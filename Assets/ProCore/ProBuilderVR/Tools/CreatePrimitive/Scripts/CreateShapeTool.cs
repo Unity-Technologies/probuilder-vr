@@ -171,6 +171,7 @@ namespace ProBuilder2.VR
 
 			if (standardInput.action.wasJustPressed)
 			{
+				// @todo
 				switch(m_Shape)
 				{
 					default:

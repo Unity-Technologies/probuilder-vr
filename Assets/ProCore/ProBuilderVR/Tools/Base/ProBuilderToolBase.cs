@@ -31,6 +31,8 @@ namespace ProBuilder2.VR
 		public Transform menuOrigin { get; set; }
 		public Transform alternateMenuOrigin { get; set; }
 		public Transform rayOrigin { get; set; }
+		private EditorWindow m_VRView = null;
+		private bool m_SendMouseEvent = true;
 		
 		// Disable the selection tool to turn of the hover highlight.  Not using
 		// IExclusiveMode because we still want locomotion.
@@ -65,6 +67,7 @@ namespace ProBuilder2.VR
 			{
 				if(win.GetType().ToString().Contains("VRView"))
 				{
+					m_VRView = win;
 					Type vrViewType = win.GetType();
 
 					EventInfo eventInfo = vrViewType.GetEvent("onGUIDelegate", BindingFlags.Public | BindingFlags.Static);
@@ -78,9 +81,29 @@ namespace ProBuilder2.VR
 			pb_Start();
 		}
 
+		private void Update()
+		{
+#if UNITY_EDITOR
+			// HACK - ripped from EditorVR pixelraycastmodule
+			if (m_SendMouseEvent && m_VRView != null)
+			{
+				EditorApplication.delayCall += () =>
+				{
+					if (this != null) // Because this is a delay call, the component will be null when EditorVR closes
+					{
+						m_VRView.SendEvent(new Event() { type = EventType.MouseMove } );
+					}
+				};
+
+				m_SendMouseEvent = false; // Don't allow another one to queue until the current one is processed
+			}
+#endif
+		}
+
 		private void OnGUIInternal(EditorWindow window)
 		{
 			pb_OnSceneGUI(window);
+			m_SendMouseEvent = true;
 		}
 
 		private void OnDestroy()

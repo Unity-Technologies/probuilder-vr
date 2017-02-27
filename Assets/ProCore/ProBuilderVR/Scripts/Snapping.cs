@@ -9,6 +9,20 @@ using UnityEditor;
 
 namespace ProBuilder2.VR
 {
+	public struct VertexSnap
+	{
+		public const float MAX_VERTEX_SNAP_DISTANCE = .5f;
+
+		public bool valid;
+
+		public Vector3 point;
+
+		public VertexSnap(bool valid, Vector3 point)
+		{
+			this.valid = valid;
+			this.point = point;
+		}
+	}
 
 	public static class Snapping
 	{
@@ -47,6 +61,7 @@ namespace ProBuilder2.VR
 
 #if UNITY_EDITOR
 		private static MethodInfo m_FindNearestVertexMethod = null;
+		private static MethodInfo m_PickGameObjectMethod = null;
 		private static Camera m_CurrentCamera = null;
 		private static Camera m_HandleCamera = null;
 
@@ -108,6 +123,84 @@ namespace ProBuilder2.VR
 			vertex = Vector3.zero;
 			return false;
 #endif
+		}
+
+		/**
+		 *	Similar to FindNearestVertex, except this function returns the first point of contact respecting backface culling.
+		 */
+		public static bool FindNearestVertex2(Ray ray, GameObject[] targets, out Vector3 point, out Vector3 vertex)
+		{
+#if UNITY_EDITOR
+			PushCamera(ray, null);
+
+			if(m_PickGameObjectMethod == null)
+				m_PickGameObjectMethod = typeof(HandleUtility).GetMethod(
+					"PickGameObject",
+					BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Instance,
+					null,
+					new System.Type[] {typeof(Vector2), typeof(bool), typeof(GameObject[]), typeof(GameObject[]) },
+					null);
+
+			// internal static GameObject PickGameObject(Vector2 position, bool selectPrefabRoot, GameObject[] ignore, GameObject[] filter)
+
+			object[] pickGameObjectParams = new object[] {
+				(Vector2) m_HandleCamera.pixelRect.center,
+				false,
+				null,
+				targets
+			};
+
+			object res = null;
+
+			try
+			{
+				res = m_PickGameObjectMethod.Invoke(null, pickGameObjectParams);
+			}
+			catch
+			{
+
+			}
+
+			PopCamera();
+
+			GameObject nearest = res == null ? null : res as GameObject;
+
+			pb_Object pb = nearest != null ? nearest.GetComponent<pb_Object>() : null;
+
+			if(pb != null)
+			{
+				pb_RaycastHit hit;
+
+				if( pb_HandleUtility.FaceRaycast(ray, pb, out hit) )
+				{
+					float distance = Mathf.Infinity;
+					Vector3 best = Vector3.zero;
+					int[] faceVertices = pb.faces[hit.face].distinctIndices;
+
+					for(int i = 0; i < faceVertices.Length; i++)
+					{
+						Vector3 v = pb.vertices[faceVertices[i]];
+						float d = Vector3.Distance(v, hit.point);
+
+						if(d < distance)
+						{
+							distance = d;
+							best = v;
+						}
+					}
+
+					point = pb.transform.TransformPoint(hit.point);
+					vertex = pb.transform.TransformPoint(best);
+
+					return true;
+				}
+			}
+#endif
+
+			point = Vector3.zero;
+			vertex = Vector3.zero;
+
+			return false;
 		}
 	}
 }

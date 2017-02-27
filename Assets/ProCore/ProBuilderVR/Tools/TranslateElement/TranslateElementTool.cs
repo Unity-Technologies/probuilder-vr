@@ -35,8 +35,6 @@ namespace ProBuilder2.VR
 			Finish
 		}
 
-		const float MAX_VERTEX_SNAP_DISTANCE = .5f;
-
 	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
 		public Action<GameObject, bool> setHighlight { get; set; }
 
@@ -59,8 +57,9 @@ namespace ProBuilder2.VR
 		private Vector3 m_DragDirection = Vector3.zero;
 		private Vector3 m_Offset = Vector3.zero;
 		private Vector3 m_DraggedPoint = Vector3.zero;
-		private Transform[] m_ProBuilderObjectsInScene = null;
+		private GameObject[] m_ProBuilderObjectsInScene = null;
 		private Vector3 m_PreviousVertexTranslation = Vector3.zero;
+		private VertexSnap m_VertexSnap = new VertexSnap(false, Vector3.zero);
 
 		private pb_Object m_Object;
 		private pb_Face m_Face;
@@ -96,30 +95,21 @@ namespace ProBuilder2.VR
 			}
 		}
 
-		struct VertexSnap
-		{
-			public bool valid;
-
-			public Vector3 point;
-
-			public VertexSnap(bool valid, Vector3 point)
-			{
-				this.valid = valid;
-				this.point = point;
-			}
-		}
-
-		VertexSnap m_VertexSnap = new VertexSnap(false, Vector3.zero);
-
 		public override void pb_OnSceneGUI(EditorWindow win)
 		{
+			if(Event.current.type != EventType.MouseMove)
+				return;
+
 			if(m_State == CreateState.Finish && m_Object != null)
 			{
-				m_VertexSnap.valid = Snapping.FindNearestVertex(new Ray(rayOrigin.position, rayOrigin.forward), m_ProBuilderObjectsInScene, out m_VertexSnap.point);
+				Vector3 collision;
+
+				m_VertexSnap.valid = Snapping.FindNearestVertex2(new Ray(rayOrigin.position, rayOrigin.forward), m_ProBuilderObjectsInScene, out collision, out m_VertexSnap.point);
 
 				if(m_VertexSnap.valid)
 				{
-					m_VertexSnap.valid = HandleUtility.DistancePointLine(m_VertexSnap.point, rayOrigin.position, rayOrigin.position + rayOrigin.forward * 100f) < MAX_VERTEX_SNAP_DISTANCE;
+					m_VertexSnap.valid = Vector3.Distance(collision, m_VertexSnap.point) < VertexSnap.MAX_VERTEX_SNAP_DISTANCE;
+					// m_VertexSnap.valid = HandleUtility.DistancePointLine(m_VertexSnap.point, rayOrigin.position, rayOrigin.position + rayOrigin.forward * 100f) < VertexSnap.MAX_VERTEX_SNAP_DISTANCE;
 				}
 			}
 			else
@@ -132,7 +122,7 @@ namespace ProBuilder2.VR
 		{
 			GameObject first = getFirstGameObject(rayOrigin);
 
-			if(first == null)	
+			if(first == null)
 			{
 				if(m_HighlightModule != null)
 					m_HighlightModule.Clear();
@@ -185,7 +175,7 @@ namespace ProBuilder2.VR
 				}
 
 				m_State = CreateState.Finish;
-				m_ProBuilderObjectsInScene = UnityEngine.Object.FindObjectsOfType<pb_Object>().Where(x => x != m_Object).Select(y => y.transform).ToArray();
+				m_ProBuilderObjectsInScene = UnityEngine.Object.FindObjectsOfType<pb_Object>().Where(x => x != m_Object).Select(y => y.gameObject).ToArray();
 
 				m_Positions = new Vector3[pb.vertexCount];
 				m_SettingPositions = new Vector3[pb.vertexCount];
