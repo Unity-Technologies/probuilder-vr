@@ -6,7 +6,7 @@ ProBuilder in the matrix.
 
 - Download the [EditorVR version of Unity 5.4.3](http://rebrand.ly/EditorVR-build)
 - Do **not** download the EditorVR Unity package (ProBuilderVR uses a snapshot from the development branch)
-- Download [ProBuilderVR-with-dependencies.unitypackage](https://github.com/procore3d/probuilder-vr/releases/tag/v0.1.0b0).
+- Download [ProBuilderVR-with-dependencies.unitypackage](https://github.com/procore3d/probuilder-vr/releases/latest).
 - Open new project in Unity 5.4.3-vr
 - Import ProBuilderVR-with-dependencies.unitypackage
 - Open EditorVR (`Control + Shift + E`)
