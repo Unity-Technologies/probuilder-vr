@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 Shader "Hidden/ProBuilder VR/Overlay" 
 {
 	Properties
@@ -42,7 +44,7 @@ Shader "Hidden/ProBuilder VR/Overlay"
 			{
 				v2f o;
 
-				o.pos = mul(UNITY_MATRIX_MVP, v.vertex + v.normal * _Offset);
+				o.pos = UnityObjectToClipPos(v.vertex + v.normal * _Offset);
 
 				return o;
 			}
