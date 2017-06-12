@@ -1,12 +1,12 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputNew;
-using UnityEngine.Experimental.EditorVR;
-using UnityEngine.Experimental.EditorVR.Menus;
-using UnityEngine.Experimental.EditorVR.Tools;
-using UnityEngine.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR;
+using UnityEditor.Experimental.EditorVR.Menus;
+using UnityEditor.Experimental.EditorVR.Tools;
+using UnityEditor.Experimental.EditorVR.Proxies;
+using UnityEditor.Experimental.EditorVR.Utilities;
 using ProBuilder2.Common;
-
 namespace ProBuilder2.VR
 {
 	[MainMenuItem("Create Shape", "ProBuilder", "Create geometry in the scene")]
@@ -14,9 +14,10 @@ namespace ProBuilder2.VR
 									ITool, 
 									IStandardActionMap,
 									IUsesRayOrigin,
+									IUsesRayLocking,
 									IUsesRaycastResults,
 									IUsesSpatialHash,
-									IUsesViewerPivot,
+									IUsesCameraRig,
 									ICustomRay
 	{
 
@@ -28,16 +29,7 @@ namespace ProBuilder2.VR
 
 		Shape m_Shape = Shape.Cube;
 
-		public Transform viewerPivot { get; set; }
-		public Action<GameObject> addToSpatialHash { get; set; }
-		public Action<GameObject> removeFromSpatialHash { get; set; }
-	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
-
-	   	// ICustomRay
-		public DefaultRayVisibilityDelegate showDefaultRay { get; set; }
-		public DefaultRayVisibilityDelegate hideDefaultRay { get; set; }
-		public Func<Transform, object, bool> lockRay { get; set; }
-		public Func<Transform, object, bool> unlockRay { get; set; }
+		public Transform cameraRig { get; set; }
 
 		enum ShapeCreationState
 		{
@@ -63,34 +55,35 @@ namespace ProBuilder2.VR
 
 		public override void pb_Start()
 		{
-			m_ShapeBounds = U.Object.CreateGameObjectWithComponent<SelectionBoundsModule>();
-			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
-			m_GridModule = U.Object.CreateGameObjectWithComponent<GridModule>();
-			m_GuideModule = U.Object.CreateGameObjectWithComponent<GuideModule>();
+			m_ShapeBounds = ObjectUtils.CreateGameObjectWithComponent<SelectionBoundsModule>();
+			m_AudioModule = ObjectUtils.CreateGameObjectWithComponent<VRAudioModule>();
+			m_GridModule = ObjectUtils.CreateGameObjectWithComponent<GridModule>();
+			m_GuideModule = ObjectUtils.CreateGameObjectWithComponent<GuideModule>();
 			m_GridModule.SetVisible(false);
 
-			m_ProxyRay = U.Object.Instantiate(m_ProxyRayPrefab.gameObject).GetComponent<DefaultProxyRay>();
+			m_ProxyRay = ObjectUtils.Instantiate(m_ProxyRayPrefab.gameObject).GetComponent<DefaultProxyRay>();
 			m_ProxyRay.transform.position = Vector3.zero;
 			m_ProxyRay.transform.localRotation = Quaternion.identity;
 			m_ProxyRay.transform.SetParent(rayOrigin, false);
 
-			hideDefaultRay(rayOrigin);
-			lockRay(rayOrigin, this);
+			this.HideDefaultRay(rayOrigin);
+			this.LockRay(rayOrigin, this);
 		}
 
 		public override void pb_OnDestroy()
 		{
-			U.Object.Destroy(m_AudioModule.gameObject);
-			U.Object.Destroy(m_ShapeBounds.gameObject);
-			U.Object.Destroy(m_GridModule.gameObject);
-			U.Object.Destroy(m_GuideModule.gameObject);
-			U.Object.Destroy(m_ProxyRay.gameObject);
+			ObjectUtils.Destroy(m_AudioModule.gameObject);
+			ObjectUtils.Destroy(m_ShapeBounds.gameObject);
+			ObjectUtils.Destroy(m_GridModule.gameObject);
+			ObjectUtils.Destroy(m_GuideModule.gameObject);
+			// EditorVR is freeing this ?
+			// ObjectUtils.Destroy(m_ProxyRay.gameObject);
 			
-			showDefaultRay(rayOrigin);
-			unlockRay(rayOrigin, this);
+			this.ShowDefaultRay(rayOrigin);
+			this.UnlockRay(rayOrigin, this);
 		}
 
-		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
+		public void ProcessInput(ActionMapInput input, ConsumeControlDelegate consumeControl)
 		{
 			var standardInput = (Standard)input;
 
@@ -116,15 +109,15 @@ namespace ProBuilder2.VR
 
 		private pb_RaycastHit m_RaycastHit;
 
-		void HandleStartPoint(Standard standardInput, Action<InputControl> consumeControl)
+		void HandleStartPoint(Standard standardInput, ConsumeControlDelegate consumeControl)
 		{
 			// HandleStartPoint can be called before Start()?
 			if(m_GridModule == null)
 				return;
 
-	   		GameObject first = getFirstGameObject(rayOrigin);
+	   		GameObject first = this.GetFirstGameObject(rayOrigin);
 	   		pb_Object pb = first != null ? first.GetComponent<pb_Object>() : null;
-	   		Vector3 rayCollisionPoint;
+	   		Vector3 rayCollisionPoint = Vector3.zero;
 	   		
 			Ray ray = new Ray(rayOrigin.position, rayForwardSmoothed.Add(rayOrigin.forward));
 
@@ -155,7 +148,7 @@ namespace ProBuilder2.VR
 				m_GridModule.transform.localRotation = Quaternion.LookRotation(m_Plane.normal);
 
 				// Calculate the snap increment based on distance from viewer.  Split into 4 segments.
-				float distance = Mathf.Clamp(Vector3.Distance(m_GridModule.transform.position, viewerPivot.position), 0f, 10f) / 10f;
+				float distance = Mathf.Clamp(Vector3.Distance(m_GridModule.transform.position, cameraRig.position), 0f, 10f) / 10f;
 				m_SnapIncrement = Snapping.DEFAULT_INCREMENT * System.Math.Max(1, Mathf.Pow(2, (int)(distance * 4)));
 
 				m_GridModule.SetSnapIncrement(m_SnapIncrement);
@@ -191,13 +184,13 @@ namespace ProBuilder2.VR
 					};
 					m_CurrentShape.gameObject.GetComponent<MeshRenderer>().sharedMaterial = m_HighlightMaterial;
 					m_State = ShapeCreationState.EndPoint;
-					addToSpatialHash(m_CurrentShape.gameObject);
+					this.AddToSpatialHash(m_CurrentShape.gameObject);
 					consumeControl(standardInput.action);
 				}
 			}
 		}
 
-		void HandleFinishPoint(Standard standardInput, Action<InputControl> consumeControl)
+		void HandleFinishPoint(Standard standardInput, ConsumeControlDelegate consumeControl)
 		{
 			if(m_CurrentShape == null)
 				return;

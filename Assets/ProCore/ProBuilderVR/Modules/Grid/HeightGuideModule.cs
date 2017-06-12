@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using UnityEngine.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR.Utilities;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +28,7 @@ namespace ProBuilder2.VR
 
 		void OnDestroy()
 		{
-			U.Object.Destroy(m_Mesh);
+			ObjectUtils.Destroy(m_Mesh);
 		}
 
 		void LateUpdate()

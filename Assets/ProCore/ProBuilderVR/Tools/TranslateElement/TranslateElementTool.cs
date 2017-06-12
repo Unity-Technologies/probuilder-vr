@@ -7,11 +7,12 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputNew;
-using UnityEngine.Experimental.EditorVR;
-using UnityEngine.Experimental.EditorVR.Menus;
-using UnityEngine.Experimental.EditorVR.Tools;
-using UnityEngine.Experimental.EditorVR.Modules;
-using UnityEngine.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR;
+using UnityEditor.Experimental.EditorVR.Menus;
+using UnityEditor.Experimental.EditorVR.Tools;
+using UnityEditor.Experimental.EditorVR.Modules;
+using UnityEditor.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR.Proxies;
 using ProBuilder2.Common;
 
 namespace ProBuilder2.VR
@@ -34,9 +35,6 @@ namespace ProBuilder2.VR
 			Start,
 			Finish
 		}
-
-	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
-		public Action<GameObject, bool> setHighlight { get; set; }
 
 		public Color32 highlightFaceColor = new Color32(0, 188, 212, 96);
 		public Color32 directSelectFaceColor = new Color32(212, 0, 171, 96);
@@ -69,21 +67,21 @@ namespace ProBuilder2.VR
 
 		public override void pb_Start()
 		{
-			m_HighlightModule = U.Object.CreateGameObjectWithComponent<HighlightElementsModule>();
-			m_GuideModule = U.Object.CreateGameObjectWithComponent<HeightGuideModule>();
-			m_AudioModule = U.Object.CreateGameObjectWithComponent<VRAudioModule>();
+			m_HighlightModule = ObjectUtils.CreateGameObjectWithComponent<HighlightElementsModule>();
+			m_GuideModule = ObjectUtils.CreateGameObjectWithComponent<HeightGuideModule>();
+			m_AudioModule = ObjectUtils.CreateGameObjectWithComponent<VRAudioModule>();
 			m_GuideModule.SetVisible(false);
 			try { m_DirectSelectThreshold = Mathf.Max(m_DirectSelectThreshold, rayOrigin.GetComponentInChildren<DefaultProxyRay>().pointerLength * 1.3f); } catch {}
 		}
 
 		public override void pb_OnDestroy()
 		{
-			U.Object.Destroy(m_HighlightModule.gameObject);
-			U.Object.Destroy(m_AudioModule.gameObject);
-			U.Object.Destroy(m_GuideModule.gameObject);
+			ObjectUtils.Destroy(m_HighlightModule.gameObject);
+			ObjectUtils.Destroy(m_AudioModule.gameObject);
+			ObjectUtils.Destroy(m_GuideModule.gameObject);
 		}
 
-		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
+		public void ProcessInput(ActionMapInput input, ConsumeControlDelegate consumeControl)
 		{
 			if(m_State == CreateState.Start)
 			{
@@ -118,9 +116,9 @@ namespace ProBuilder2.VR
 			}
 		}
 
-		private void HandleStart(Standard input, Action<InputControl> consumeControl)
+		private void HandleStart(Standard input, ConsumeControlDelegate consumeControl)
 		{
-			GameObject first = getFirstGameObject(rayOrigin);
+			GameObject first = this.GetFirstGameObject(rayOrigin);
 
 			if(first == null)
 			{
@@ -150,7 +148,7 @@ namespace ProBuilder2.VR
 					m_HighlightModule.SetFaceHighlight(pb, new pb_Face[] { pb.faces[hit.face] }, true);
 				}
 
-				setHighlight(pb.gameObject, false);
+				this.SetHighlight(pb.gameObject, false);
 
 				consumeControl(input.action);
 
@@ -191,7 +189,7 @@ namespace ProBuilder2.VR
 			}
 		}
 
-		private void HandleFinish(Standard input, Action<InputControl> consumeControl)
+		private void HandleFinish(Standard input, ConsumeControlDelegate consumeControl)
 		{
 			// Ready for next object to be created
 			if (input.action.wasJustReleased)
@@ -247,7 +245,7 @@ namespace ProBuilder2.VR
 				m_HighlightModule.UpdateVertices(m_Object);
 			}
 			
-			setHighlight(m_Object.gameObject, false);
+			this.SetHighlight(m_Object.gameObject, false);
 			consumeControl(input.action);
 		}
 	}

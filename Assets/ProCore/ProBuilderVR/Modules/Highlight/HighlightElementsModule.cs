@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using ProBuilder2.Common;
-using UnityEngine.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR.Utilities;
 
 namespace ProBuilder2.VR
 {
@@ -50,7 +50,7 @@ namespace ProBuilder2.VR
 			List<Mesh> m = m_Highlights.Values.ToList();
 
 			for(int i = m.Count - 1; i > -1; i--)
-				U.Object.Destroy(m[i]);
+				ObjectUtils.Destroy(m[i]);
 
 			m_Highlights.Clear();
 		}
@@ -96,7 +96,7 @@ namespace ProBuilder2.VR
 					{	
 						Mesh t = m;
 						m_Highlights.Remove(pb);
-						U.Object.Destroy(t);
+						ObjectUtils.Destroy(t);
 					}
 					return;
 				}
@@ -110,7 +110,7 @@ namespace ProBuilder2.VR
 						{
 							Mesh t = m_Highlights[p];
 							m_Highlights.Remove(p);
-							U.Object.Destroy(t);
+							Object.Destroy(t);
 						}
 					}
 				}

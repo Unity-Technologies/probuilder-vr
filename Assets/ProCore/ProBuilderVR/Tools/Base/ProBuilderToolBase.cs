@@ -4,10 +4,10 @@ using UnityEditor;
 #endif
 using System;
 using UnityEngine.InputNew;
-using UnityEngine.Experimental.EditorVR;
-using UnityEngine.Experimental.EditorVR.Menus;
-using UnityEngine.Experimental.EditorVR.Tools;
-using UnityEngine.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR;
+using UnityEditor.Experimental.EditorVR.Menus;
+using UnityEditor.Experimental.EditorVR.Tools;
+using UnityEditor.Experimental.EditorVR.Utilities;
 using System.Reflection;
 
 namespace ProBuilder2.VR
@@ -25,9 +25,6 @@ namespace ProBuilder2.VR
 		[SerializeField] private ProBuilderToolMenu m_ToolMenuPrefab;
 
 		private GameObject m_ToolMenu;
-		public InstantiateUIDelegate instantiateUI { private get; set; }
-		public ConnectInterfacesDelegate connectInterfaces { private get; set; }
-		public Func<Transform, Type, bool> selectTool { private get; set; }
 		public Transform menuOrigin { get; set; }
 		public Transform alternateMenuOrigin { get; set; }
 		public Transform rayOrigin { get; set; }
@@ -46,11 +43,12 @@ namespace ProBuilder2.VR
 			}
 			else
 			{
-				m_ToolMenu = instantiateUI(m_ToolMenuPrefab.gameObject, alternateMenuOrigin, false);
+				m_ToolMenu = this.InstantiateUI(m_ToolMenuPrefab.gameObject, alternateMenuOrigin, false);
+				// m_ToolMenu = instantiateUI(m_ToolMenuPrefab.gameObject, alternateMenuOrigin, false);
 				var toolsMenu = m_ToolMenu.GetComponent<ProBuilderToolMenu>();
-				connectInterfaces(toolsMenu, rayOrigin);
-				toolsMenu.onSelectTranslateTool += () => { selectTool(rayOrigin, typeof(TranslateElementTool)); };
-				toolsMenu.onSelectShapeTool += () => { selectTool(rayOrigin, typeof(CreateShapeTool)); };
+				this.ConnectInterfaces(toolsMenu, rayOrigin);
+				toolsMenu.onSelectTranslateTool += () => { this.SelectTool(rayOrigin, typeof(TranslateElementTool)); };
+				toolsMenu.onSelectShapeTool += () => { this.SelectTool(rayOrigin, typeof(CreateShapeTool)); };
 			}
 				
 			m_SelectionTool = gameObject.GetComponent<SelectionTool>();
@@ -69,8 +67,7 @@ namespace ProBuilder2.VR
 				{
 					m_VRView = win;
 					Type vrViewType = win.GetType();
-
-					EventInfo eventInfo = vrViewType.GetEvent("onGUIDelegate", BindingFlags.Public | BindingFlags.Static);
+					EventInfo eventInfo = vrViewType.GetEvent("beforeOnGUI", BindingFlags.Public | BindingFlags.Static);
 					Delegate onGUIDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType,
 						this,
 						typeof(ProBuilderToolBase).GetMethod("OnGUIInternal", BindingFlags.Instance | BindingFlags.NonPublic) );
@@ -114,7 +111,7 @@ namespace ProBuilder2.VR
 				{
 					Type vrViewType = win.GetType();
 
-					EventInfo eventInfo = vrViewType.GetEvent("onGUIDelegate", BindingFlags.Public | BindingFlags.Static);
+					EventInfo eventInfo = vrViewType.GetEvent("beforeOnGUI", BindingFlags.Public | BindingFlags.Static);
 					Delegate onGUIDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType,
 						this,
 						typeof(ProBuilderToolBase).GetMethod("OnGUIInternal", BindingFlags.Instance | BindingFlags.NonPublic) );
@@ -127,7 +124,7 @@ namespace ProBuilder2.VR
 				m_SelectionTool.enabled = true;
 
 			if(m_ToolMenu != null)
-				U.Object.Destroy(m_ToolMenu);
+				ObjectUtils.Destroy(m_ToolMenu);
 
 			pb_OnDestroy();
 		}

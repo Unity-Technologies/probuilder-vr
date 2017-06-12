@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR.Utilities;
 #if UNITY_EDITOR
 using ProBuilder2.Common;
 using System.Reflection;
@@ -75,7 +75,7 @@ namespace ProBuilder2.VR
 		private static void PushCamera(Ray ray, Camera camera)
 		{
 			if(m_HandleCamera == null)
-				m_HandleCamera = (Camera) U.Object.CreateGameObjectWithComponent(typeof(Camera));
+				m_HandleCamera = (Camera) ObjectUtils.CreateGameObjectWithComponent(typeof(Camera));
 
 			m_CurrentCamera = camera;
 

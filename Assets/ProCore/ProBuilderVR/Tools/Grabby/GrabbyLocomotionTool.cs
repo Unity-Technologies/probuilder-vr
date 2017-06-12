@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputNew;
-using UnityEngine.Experimental.EditorVR.Menus;
-using UnityEngine.Experimental.EditorVR.Helpers;
-using UnityEngine.Experimental.EditorVR.Tools;
-using UnityEngine.Experimental.EditorVR.Utilities;
-using UnityEngine.Experimental.EditorVR.Manipulators;
+using UnityEditor.Experimental.EditorVR;
+using UnityEditor.Experimental.EditorVR.Menus;
+using UnityEditor.Experimental.EditorVR.Helpers;
+using UnityEditor.Experimental.EditorVR.Tools;
+using UnityEditor.Experimental.EditorVR.Utilities;
+using UnityEditor.Experimental.EditorVR.Manipulators;
 
 namespace ProBuilder2.VR
 {
@@ -15,35 +16,32 @@ namespace ProBuilder2.VR
 										ITool,
 										ICustomActionMap,
 										IUsesRayOrigin,
-										IUsesViewerPivot,
+										IUsesCameraRig,
 										IUsesRaycastResults,
 										IExclusiveMode
 	{
-		public Transform viewerPivot { private get; set; }
 		public Transform rayOrigin { get; set; }
-	   	public Func<Transform, GameObject> getFirstGameObject { get; set; }
-
 		public ActionMap actionMap { get { return m_GrabbyActionMap; } }
 
-		public DirectManipulator directManipulator { get { return m_DirectManipulator; } }
-		[SerializeField]
-		private DirectManipulator m_DirectManipulator;
+		// public DirectManipulator directManipulator { get { return m_DirectManipulator; } }
+		// [SerializeField]
+		// private DirectManipulator m_DirectManipulator;
 
 		[SerializeField]
 		private ActionMap m_GrabbyActionMap;
-
+		public Transform cameraRig { get; set; }
 		private Vector3 m_GrabTarget = Vector3.zero;
 		private bool m_GrabbyEngaged = false;
 		private Vector3 m_LastRay = Vector3.up;
 
-		public void ProcessInput(ActionMapInput input, Action<InputControl> consumeControl)
+		public void ProcessInput(ActionMapInput input, ConsumeControlDelegate consumeControl)
 		{
 			GrabbyLocomotion grabInput = (GrabbyLocomotion) input;
 
 			if(grabInput.trigger2.wasJustPressed)
 			{
 				// engage grabby
-				GameObject first = getFirstGameObject(rayOrigin);
+				GameObject first = this.GetFirstGameObject(rayOrigin);
 
 				if( first != null)
 				{
@@ -76,7 +74,7 @@ namespace ProBuilder2.VR
 			if(Vector3.Dot(rayOrigin.forward, cross) > 0f)
 				angle = -angle;
 
-			viewerPivot.RotateAround(m_GrabTarget, Vector3.up, angle);
+			cameraRig.RotateAround(m_GrabTarget, Vector3.up, angle);
 
 			m_LastRay = rayOrigin.forward;
 		}

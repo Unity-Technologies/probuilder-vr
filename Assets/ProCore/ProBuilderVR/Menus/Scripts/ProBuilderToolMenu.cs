@@ -1,6 +1,6 @@
 using System;
 using UnityEngine;
-using UnityEngine.Experimental.EditorVR.Menus;
+using UnityEditor.Experimental.EditorVR;
 
 namespace ProBuilder2.VR
 {
