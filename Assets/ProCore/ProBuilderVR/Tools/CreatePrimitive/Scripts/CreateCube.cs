@@ -134,15 +134,18 @@ namespace ProBuilder2.VR
 				m_Mesh.ReverseWindingOrder(m_Mesh.faces);
 			}
 
-			template[0] = m_StartPoint;
-			template[1] = m_StartPoint + Vector3.Scale(new Vector3(1f, 0f, 0f), m_Size);
-			template[2] = m_StartPoint + Vector3.Scale(new Vector3(1f, 0f, 1f), m_Size);
-			template[3] = m_StartPoint + Vector3.Scale(new Vector3(0f, 0f, 1f), m_Size);
+			// PhysX throws errors like dolla dolla bills if fed a zera space mesh
+			Vector3 scale = MakeNotZero(m_Size);
 
-			template[4] = m_StartPoint + Vector3.Scale(new Vector3(0f, 1f, 0f), m_Size);
-			template[5] = m_StartPoint + Vector3.Scale(new Vector3(1f, 1f, 0f), m_Size);
-			template[6] = m_StartPoint + Vector3.Scale(new Vector3(1f, 1f, 1f), m_Size);
-			template[7] = m_StartPoint + Vector3.Scale(new Vector3(0f, 1f, 1f), m_Size);
+			template[0] = m_StartPoint;
+			template[1] = m_StartPoint + Vector3.Scale(new Vector3(1f, 0f, 0f), scale);
+			template[2] = m_StartPoint + Vector3.Scale(new Vector3(1f, 0f, 1f), scale);
+			template[3] = m_StartPoint + Vector3.Scale(new Vector3(0f, 0f, 1f), scale);
+
+			template[4] = m_StartPoint + Vector3.Scale(new Vector3(0f, 1f, 0f), scale);
+			template[5] = m_StartPoint + Vector3.Scale(new Vector3(1f, 1f, 0f), scale);
+			template[6] = m_StartPoint + Vector3.Scale(new Vector3(1f, 1f, 1f), scale);
+			template[7] = m_StartPoint + Vector3.Scale(new Vector3(0f, 1f, 1f), scale);
 
 			int len = pb_Constant.TRIANGLES_CUBE.Length;
 
@@ -153,6 +156,14 @@ namespace ProBuilder2.VR
 
 			m_Mesh.ToMesh();
 			m_Mesh.Refresh();
+		}
+
+		private static Vector3 MakeNotZero(Vector3 v)
+		{
+			return new Vector3( 
+				Mathf.Max(.0001f, Mathf.Abs(v.x)) * Mathf.Sign(v.x),
+				Mathf.Max(.0001f, Mathf.Abs(v.y)) * Mathf.Sign(v.y),
+				Mathf.Max(.0001f, Mathf.Abs(v.z)) * Mathf.Sign(v.z) );
 		}
 	}
 }
