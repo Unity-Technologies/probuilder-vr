@@ -4,12 +4,14 @@ ProBuilder in the matrix.
 
 ## Super Quick Start
 
-- Download the [EditorVR version of Unity 5.4.3](http://rebrand.ly/EditorVR-build)
-- Do **not** download the EditorVR Unity package (ProBuilderVR uses a snapshot from the development branch)
-- Download [ProBuilderVR-with-dependencies.unitypackage](https://github.com/procore3d/probuilder-vr/releases/latest).
-- Open new project in Unity 5.4.3-vr
-- Import ProBuilderVR-with-dependencies.unitypackage
-- Open EditorVR (`Control + Shift + E`)
+- Download the [EditorVR version of Unity 5.6](http://beta.unity3d.com/download/95e00fb027d2/UnityDownloadAssistant-5.6.0xEditorVR-p3.exe)
+- Download the [EditorVR 0.0.6 Unity package](https://github.com/Unity-Technologies/EditorVR/releases/tag/v0%2F0.0.6) 
+- Download [ProBuilderVR.unitypackage](https://github.com/procore3d/probuilder-vr/releases/latest)
+- Open new project in EditorVR Unity
+- Import EditorVR.unitypackage
+- Import [SteamVR](https://www.assetstore.unity3d.com/en/#!/content/32647) (or Oculus) from Asset Store
+- Import ProBuilderVR-0.0.2.unitypackage
+- Open `Windows > EditorVR`
 
 ## Installing from Git - Quick Start
 
@@ -24,10 +26,6 @@ If you're only interested in releases, follow the Super Quick Start steps.
 - Download and import [SteamVR](https://www.assetstore.unity3d.com/en/#!/content/32647) from Asset Store
 
 ## FAQ
-
-### `IUsesMenuOrigin not found`
-
-You downloaded the EditorVR unity package.  Delete the `EditorVR` folder and import `ProBuilderVR-with-dependencies.unitypackage`
 
 ###  Nothing is working!
 
