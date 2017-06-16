@@ -1,5 +1,4 @@
-#define PROTOTYPE
-#if UNITY_EDITOR || UNITY_STANDALONE
+﻿#if UNITY_EDITOR || UNITY_STANDALONE
 using UnityEngine;
 using System.Collections;
 using ProBuilder2.Common;

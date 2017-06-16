@@ -1,5 +1,4 @@
-#define PROTOTYPE
-/**
+﻿/**
  *	Set new ProBuilder objects to use special UV2 unwrap params.
  */
 

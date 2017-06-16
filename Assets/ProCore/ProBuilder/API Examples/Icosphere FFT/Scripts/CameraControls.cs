@@ -1,5 +1,4 @@
-#define PROTOTYPE
-/**
+﻿/**
  * Camera orbit controls.
  */
 

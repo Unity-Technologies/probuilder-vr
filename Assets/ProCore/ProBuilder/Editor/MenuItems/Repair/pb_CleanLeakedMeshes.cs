@@ -1,7 +1,11 @@
-#define PROTOTYPE
+#if !UNITY_4_6 && !UNITY_4_7
+#define UNITY_5
+#endif
+
 using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using ProBuilder2.Common;
 
 namespace ProBuilder2.Actions
 {

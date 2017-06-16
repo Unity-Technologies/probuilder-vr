@@ -1,3 +1,129 @@
+# ProBuilder 2.9.1f0
+
+## Features
+
+- New PLY model exporter.
+- OBJ export rewritten, now supports:
+	- Multiple texture maps
+	- Vertex colors (MeshLab format)
+	- Texture map offset / scale
+	- Local or world space mesh coordinates
+	- PBR maps (http://exocortex.com/blog/extending_wavefront_mtl_to_support_pbr)
+- Improve Mesh Asset export dialog and options.
+
+## Bug Fixes
+
+- Fix ProBuilder preferences sometimes not loading.
+- Fix deprecated method warnings in 2017.1 beta.
+- Fix occasionally flipped UV axis on merged faces.
+- Don't crash if ProBuilder folder has been renamed.
+
+# ProBuilder 2.9.0f3
+
+## Features
+
+- Support for saving and loading custom Material Palettes.
+- ProBuilder now able to store preferences per-project as well as globally.
+- Significantly improve performance of Weld Vertices function.
+
+## Bug Fixes
+
+- Preferences Window now renders correctly in Unity 5.6 and up.
+- Exit Bezier Shape editing when Esc is pressed.
+- Quell unnecessary errors when ProGrids interface fails to load UnityEditor assembly.
+- Fix potentially ambiguous reference to Axis enum in API examples.
+- Fix mesh leak when exporting STL files.
+
+## Changes
+
+- Move pb_Constant into ProBuilder2.Common namespace.
+- Move pb_Lightmapping class in EditorCommon namespace.
+- Improve wording of warning when shortcut preferences are reset.
+
+# ProBuilder 2.8.1f0
+
+## Features
+
+- Improve grid snapping when placing Poly Shapes.
+- Add a callback when a mesh is rebuilt (pb_EditorUtility.AddOnMeshCompiledListener).
+- Remove max width limitation on Material Editor window.
+
+## Bug Fixes
+
+- Fix incorrect UV render scaling on retina and other scaled screens.
+- Fix deprecated warnings on Handles calls in Unity 5.6.
+- Fix Icosphere API example deprecated function calls in Unity 5.6.
+- Fix UnityObjectToViewPos warnings Unity 5.6.
+- Fix Poly Shape not generating UV2 for mesh.
+- Catch an occasional Null Reference when viewing UV2 channel.
+- Fix Null Reference in Poly Tool undo callbacks.
+- Fix errors in adding pb_Entity script during repair mesh references action.
+- Improve consistency of Vector2/3/4 hashing functions.
+- Fix particularly slow function in MergeFaces action.
+- Fix preferences GUI layout.
+
+## Changes
+
+- Start Poly Shape height at 0.
+- First Poly Shape click always sets pivot.
+
+# ProBuilder 2.8.0f1
+
+## Features
+
+- New "Poly Shape" interactive shape.
+- New "Bezier Shape" interactive shape.
+- Unity 5.6 beta compatibility.
+- Improve default UV layouts for new shapes.
+- Add a shader for reference billboard planes ("ProBuilder/Reference Unlit").
+
+## Bug Fixes
+
+- Fix material editor applying to child transforms of selection.
+- Fix instantiated objects not getting a UV2 channel when "Auto Generate UV2" is enabled.
+- Material Editor now works with a relative path.
+- Fix incorrect handle rotations in Element mode.
+- About Window now loads even when not in *Assets/ProCore/ProBuilder*.
+- Address a rare NullReferenceException when ProBuilder Editor is initialized.
+- Don't spam Console with errors if update check fails to connect (only affects WebPlayer target).
+- Add a more descriptive message to update check if connection fails.
+
+## Changes
+
+- Automatically toggle Detail Entity Type object's lightmapping static flag, preventing broken lightmap atlases.
+
+# ProBuilder 2.7.0f7
+
+## Features
+
+- New redesigned "About" window.
+- New "Check for Updates" window and menu item.
+- Add a repair script to apply materials when upgrading from Basic to Advanced.
+- Include option to restrict "Select by Vertex Color" to current selection.
+- Add "Generate Shadow Volume" API example and action.
+- Add preference to enable experimental features (current feature: Bezier shape).
+- Add option to smooth round sides of cylinder in Shape Tool.
+- Add repair script to strip and rebuild pb_Object from Unity mesh.
+- Add repair script for rebuilding shared index caches (addressed IndexOutOfRange errors in RefreshNormals function).
+
+## Bug Fixes
+
+- Fix inconsistent About Window behavior when importing updates.
+- Make face highlight code snippet more robust in Runtime Editing example. 
+- Don't leave a progress bar behind if Probuilderize fails.
+- Fix ProBuilder-ize adding pb_Entity multiple times.
+- Apply Quick Offset adjustments to all selected ProBuilder objects.
+
+# ProBuilder 2.6.9f3
+
+## Bug Fixes
+
+- Fix vertex handles appearing offset when using an orthographic scene view.
+- Mark KDTree Triangle and pb_Stl as Any Platform in build targets.
+- Fix compile errors in standard vertex color shader on Unity 5.5 on iOS
+- Fix compile warnings in Unity 5.6.0b4
+- Use multi-Unity-version compatible shader in Vertex Colors API example.
+
 # ProBuilder 2.6.8f1
 
 ## Features

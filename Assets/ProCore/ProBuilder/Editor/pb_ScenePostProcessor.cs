@@ -1,5 +1,4 @@
-#define PROTOTYPE
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using ProBuilder2.Common;

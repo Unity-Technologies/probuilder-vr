@@ -1,4 +1,3 @@
-#define PROTOTYPE
 using UnityEngine;
 using UnityEditor;
 using System.Collections;
