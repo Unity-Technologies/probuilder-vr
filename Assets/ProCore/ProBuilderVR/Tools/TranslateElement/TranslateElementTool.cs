@@ -8,9 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.InputNew;
 using UnityEditor.Experimental.EditorVR;
-using UnityEditor.Experimental.EditorVR.Menus;
-using UnityEditor.Experimental.EditorVR.Tools;
-using UnityEditor.Experimental.EditorVR.Modules;
 using UnityEditor.Experimental.EditorVR.Utilities;
 using UnityEditor.Experimental.EditorVR.Proxies;
 using ProBuilder2.Common;
@@ -23,6 +20,7 @@ namespace ProBuilder2.VR
 	[MainMenuItem("Move Elements", "ProBuilder", "Translate selected mesh elements.")]
 	public class TranslateElementTool : ProBuilderToolBase,
 										ITool,
+										IProcessInput,
 										IStandardActionMap,
 										IUsesRaycastResults,
 										ISetHighlight
@@ -35,6 +33,10 @@ namespace ProBuilder2.VR
 			Start,
 			Finish
 		}
+
+#pragma warning disable 414
+		private ActionMap m_StandardActionMap;
+#pragma warning restore 414
 
 		public Color32 highlightFaceColor = new Color32(0, 188, 212, 96);
 		public Color32 directSelectFaceColor = new Color32(212, 0, 171, 96);
@@ -65,6 +67,14 @@ namespace ProBuilder2.VR
 		private Vector3[] m_Positions;
 		private Vector3[] m_SettingPositions;
 
+		public ActionMap standardActionMap
+		{
+			set
+			{
+				m_StandardActionMap = value;
+			}
+		}
+
 		public override void pb_Start()
 		{
 			m_HighlightModule = ObjectUtils.CreateGameObjectWithComponent<HighlightElementsModule>();
@@ -76,9 +86,9 @@ namespace ProBuilder2.VR
 
 		public override void pb_OnDestroy()
 		{
-			ObjectUtils.Destroy(m_HighlightModule.gameObject);
-			ObjectUtils.Destroy(m_AudioModule.gameObject);
-			ObjectUtils.Destroy(m_GuideModule.gameObject);
+			if(m_HighlightModule != null) ObjectUtils.Destroy(m_HighlightModule.gameObject);
+			if(m_AudioModule != null) ObjectUtils.Destroy(m_AudioModule.gameObject);
+			if(m_GuideModule != null) ObjectUtils.Destroy(m_GuideModule.gameObject);
 		}
 
 		public void ProcessInput(ActionMapInput input, ConsumeControlDelegate consumeControl)
@@ -98,7 +108,7 @@ namespace ProBuilder2.VR
 			if(Event.current.type != EventType.MouseMove)
 				return;
 
-			if(m_State == CreateState.Finish && m_Object != null)
+			if (m_State == CreateState.Finish && m_Object != null)
 			{
 				Vector3 collision;
 
@@ -129,8 +139,8 @@ namespace ProBuilder2.VR
 			}
 
 			pb_Object pb = first.GetComponent<pb_Object>();
-			
-			if(pb == null)	
+
+			if(pb == null)
 			{
 				m_HighlightModule.Clear();
 				return;
@@ -139,7 +149,7 @@ namespace ProBuilder2.VR
 			pb_RaycastHit hit;
 
 			if( pb_HandleUtility.FaceRaycast(new Ray(rayOrigin.position, rayOrigin.forward), pb, out hit) )
-			{		
+			{
 				m_IsDirectSelect = hit.distance < m_DirectSelectThreshold;
 
 				if(m_HighlightModule != null)
@@ -197,7 +207,7 @@ namespace ProBuilder2.VR
 				m_AudioModule.Play(m_Trigger, true);
 				m_GuideModule.SetVisible(false);
 				m_HighlightModule.SetFaceHighlight(m_Object, null);
-				
+
 				m_Dragging = false;
 				m_State = CreateState.Start;
 				m_Object.ToMesh();
@@ -244,7 +254,7 @@ namespace ProBuilder2.VR
 				m_Object.msh.RecalculateBounds();
 				m_HighlightModule.UpdateVertices(m_Object);
 			}
-			
+
 			this.SetHighlight(m_Object.gameObject, false);
 			consumeControl(input.action);
 		}

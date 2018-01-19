@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
+  - VRPlayer
   - MiniWorldCamera
   - ShowInMiniWorld
-  - VRPlayer
   layers:
   - Default
   - TransparentFX

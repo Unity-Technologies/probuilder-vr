@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-	
+
 namespace ProBuilder2.VR
 {
-	/**
-	 * Play audio clips in VR editor.
-	 */
+	/// <summary>
+	/// Play audio clips in VR editor.
+	/// </summary>
 	public class VRAudioModule : MonoBehaviour
 	{
 		[SerializeField] private AudioSource m_AudioSource = null;

@@ -2,23 +2,21 @@ using System;
 using UnityEngine;
 using UnityEngine.InputNew;
 using UnityEditor.Experimental.EditorVR;
-using UnityEditor.Experimental.EditorVR.Menus;
-using UnityEditor.Experimental.EditorVR.Tools;
 using UnityEditor.Experimental.EditorVR.Proxies;
 using UnityEditor.Experimental.EditorVR.Utilities;
 using ProBuilder2.Common;
+
 namespace ProBuilder2.VR
 {
 	[MainMenuItem("Create Shape", "ProBuilder", "Create geometry in the scene")]
 	public class CreateShapeTool : 	ProBuilderToolBase,
-									ITool, 
+									ITool,
+									IProcessInput,
 									IStandardActionMap,
 									IUsesRayOrigin,
-									IUsesRayLocking,
 									IUsesRaycastResults,
 									IUsesSpatialHash,
-									IUsesCameraRig,
-									ICustomRay
+									IUsesCameraRig
 	{
 
 		[SerializeField] private AudioClip m_TriggerReleased;
@@ -31,25 +29,37 @@ namespace ProBuilder2.VR
 
 		public Transform cameraRig { get; set; }
 
+		public ActionMap standardActionMap
+		{
+			set
+			{
+				m_StandardActionMap = value;
+			}
+		}
+
 		enum ShapeCreationState
 		{
 			StartPoint,
 			EndPoint
 		}
 
-		// shape creation vars
-		private ShapeCreationState m_State = ShapeCreationState.StartPoint;
-		private GameObject m_CurrentGameObject;
-		private AShapeCreator m_CurrentShape;
-		private Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
-		private pb_Object m_HoveredObject = null;
-		private float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
+#pragma warning disable 414
+		ActionMap m_StandardActionMap;
+#pragma warning restore 414
 
-		private SelectionBoundsModule m_ShapeBounds;
-		private VRAudioModule m_AudioModule;
-		private GridModule m_GridModule;
-		private GuideModule m_GuideModule;
-		private DefaultProxyRay m_ProxyRay;
+		// shape creation vars
+		ShapeCreationState m_State = ShapeCreationState.StartPoint;
+		GameObject m_CurrentGameObject;
+		AShapeCreator m_CurrentShape;
+		Plane m_Plane = new Plane(Vector3.up, Vector3.zero);
+		pb_Object m_HoveredObject = null;
+		float m_SnapIncrement = Snapping.DEFAULT_INCREMENT;
+
+		SelectionBoundsModule m_ShapeBounds;
+		VRAudioModule m_AudioModule;
+		GridModule m_GridModule;
+		GuideModule m_GuideModule;
+		DefaultProxyRay m_ProxyRay;
 
 		private RollingAverage_Vector3 rayForwardSmoothed = new RollingAverage_Vector3(Vector3.zero);
 
@@ -66,21 +76,21 @@ namespace ProBuilder2.VR
 			m_ProxyRay.transform.localRotation = Quaternion.identity;
 			m_ProxyRay.transform.SetParent(rayOrigin, false);
 
-			this.HideDefaultRay(rayOrigin);
-			this.LockRay(rayOrigin, this);
+			//this.HideDefaultRay(rayOrigin);
+			//this.LockRay(rayOrigin, this);
 		}
 
 		public override void pb_OnDestroy()
 		{
-			ObjectUtils.Destroy(m_AudioModule.gameObject);
-			ObjectUtils.Destroy(m_ShapeBounds.gameObject);
-			ObjectUtils.Destroy(m_GridModule.gameObject);
-			ObjectUtils.Destroy(m_GuideModule.gameObject);
+			if (m_AudioModule != null) ObjectUtils.Destroy(m_AudioModule.gameObject);
+			if (m_ShapeBounds != null) ObjectUtils.Destroy(m_ShapeBounds.gameObject);
+			if (m_GridModule != null) ObjectUtils.Destroy(m_GridModule.gameObject);
+			if (m_GuideModule != null) ObjectUtils.Destroy(m_GuideModule.gameObject);
 			// EditorVR is freeing this ?
-			// ObjectUtils.Destroy(m_ProxyRay.gameObject);
-			
-			this.ShowDefaultRay(rayOrigin);
-			this.UnlockRay(rayOrigin, this);
+			//ObjectUtils.Destroy(m_ProxyRay.gameObject);
+
+			//this.ShowDefaultRay(rayOrigin);
+			//this.UnlockRay(rayOrigin, this);
 		}
 
 		public void ProcessInput(ActionMapInput input, ConsumeControlDelegate consumeControl)
@@ -112,13 +122,13 @@ namespace ProBuilder2.VR
 		void HandleStartPoint(Standard standardInput, ConsumeControlDelegate consumeControl)
 		{
 			// HandleStartPoint can be called before Start()?
-			if(m_GridModule == null)
+			if (m_GridModule == null)
 				return;
 
 	   		GameObject first = this.GetFirstGameObject(rayOrigin);
 	   		pb_Object pb = first != null ? first.GetComponent<pb_Object>() : null;
 	   		Vector3 rayCollisionPoint = Vector3.zero;
-	   		
+
 			Ray ray = new Ray(rayOrigin.position, rayForwardSmoothed.Add(rayOrigin.forward));
 
 	   		if(pb != null && pb_HandleUtility.FaceRaycast(ray, pb, out m_RaycastHit))
@@ -162,7 +172,7 @@ namespace ProBuilder2.VR
 				m_GridModule.SetVisible(false);
 			}
 
-			if (standardInput.action.wasJustPressed)
+			if (standardInput != null && standardInput.action.wasJustPressed)
 			{
 				// @todo
 				switch(m_Shape)
@@ -180,7 +190,7 @@ namespace ProBuilder2.VR
 					m_CurrentShape.onShapeChanged = (v) =>
 					{
 						m_GuideModule.transform.position = v;
-						m_AudioModule.Play(m_DragAudio); 
+						m_AudioModule.Play(m_DragAudio);
 					};
 					m_CurrentShape.gameObject.GetComponent<MeshRenderer>().sharedMaterial = m_HighlightMaterial;
 					m_State = ShapeCreationState.EndPoint;
@@ -215,7 +225,7 @@ namespace ProBuilder2.VR
 
 				m_ShapeBounds.SetHighlight(m_CurrentShape.pbObject, false);
 			}
-			
+
 			consumeControl(standardInput.action);
 		}
 	}
